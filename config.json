@@ -1,0 +1,40 @@
+{
+    "gnb_process_per_second": 1280,
+    "gnb_car_mean_tranfer": 0.0009765625,
+
+    "rsu_numbers": 6,
+    "list_rsu_xcoord": [125, 375, 625, 875, 1125, 1375],
+    "list_rsu_ycoord": [1, 1, 1, 1, 1, 1],
+    "list_rsu_zcoord": [10, 10, 10, 10, 10, 10],
+    "rsu_cover_radius": 151,
+    "rsu_process_per_second": 320,
+    "rsu_rsu_mean_tranfer": 0.00001, 
+    "rsu_car_mean_tranfer": 0.0004768371582,
+    "rsu_gnb_mean_tranfer": 0.00004768371582,
+
+    "car_speed": 12,
+    "car_cover_radius": 70,
+    "car_process_per_second": 100,
+    "car_car_mean_tranfer": 0.00001,
+    "car_gnb_mean_tranfer": 0.0009765625,
+    "car_rsu_mean_tranfer": 0.0004768371582,
+
+    "default_p_rsu_to_car": 0.0,
+    "default_p_rsu_to_rsu": 0.0,
+    "default_p_rsu_to_gnb": 0.5,
+
+    "default_p_car_to_car": 0.0,
+    "default_p_car_to_rsu": 0.5,
+    "default_p_car_to_gnb": 0.5,
+
+    "car_appear_strategy": "/home/hieu/Desktop/20202/MEC2/inputFiles/car_deu5.inp",
+    "car_packet_strategy": "/home/hieu/Desktop/20202/MEC2/inputFiles/poisson_90.inp",
+
+    "sim_time": 200,
+    "cycle_time": 1.0,
+
+    "road_length": 1500,
+
+    "dump_delay_detail": "/home/hieu/Desktop/20202/MEC2/result/delayDetail.txt",
+    "dump_delay_general": "/home/hieu/Desktop/20202/MEC2/result/delayGeneral.txt"
+}
