@@ -128,8 +128,8 @@ class RsuSimulator(Object):
     def getNearCar(self, currentTime, network, func=getNearCar):
         func(self, currentTime, network)
 
-    def getNearRsu(self, currentTime, network, func=getNearRsu):
-        func(self, currentTime, network)
+    def getNearRsu(self, func=getNearRsu):
+        func(self)
 
     def working(self, message, currentTime, network, getAction=getAction):
         if message.isDone:

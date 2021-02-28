@@ -28,9 +28,9 @@ def getNearRsu(rsu):
         return None
 
 def getAction(rsu, message, currentTime, network, optimizer=None):
-    pRsuToCar = 0.0
-    pRsuToRsu = 0.0
-    pRsuToGnb = 0.5
+    pRsuToCar = 0.05
+    pRsuToRsu = 0.05
+    pRsuToGnb = 0.45
     rand = random.random()
     if rand < pRsuToCar:
         nearCar = rsu.getNearCar(currentTime, network)
