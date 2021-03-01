@@ -28,6 +28,19 @@ def getNearRsu(rsu):
         return None
 
 def getAction(rsu, message, currentTime, network, optimizer=None):
+    """Gat action of this rsu for the message
+
+    Args:
+        rsu ([RsuSimulator]): [description]
+        message ([Message]): [description]
+        currentTime ([float]): [description]
+        network ([Network]): [description]
+        optimizer ([type], optional): [description]. Defaults to None.
+
+    Returns:
+        action: [0:sendToCar, 1:sendToRsu, 2:sendToGnb or 3:process]
+        nextLocation: [The location where the message will be sent to]
+    """
     pRsuToCar = 0.05
     pRsuToRsu = 0.05
     pRsuToGnb = 0.45

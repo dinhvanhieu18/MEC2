@@ -40,9 +40,22 @@ def getNearRsu(car, currentTime, network):
         return None
 
 def getAction(car, message, currentTime, network, optimizer=None):
-    pCarToCar = 0.0
-    pCarToRsu = 0.5
-    pCarToGnb = 0.5
+    """Gat action of this car for the message
+
+    Args:
+        car ([CarSimulator]): [description]
+        message ([Message]): [description]
+        currentTime ([float]): [description]
+        network ([Network]): [description]
+        optimizer ([type], optional): [description]. Defaults to None.
+
+    Returns:
+        action: [0:sendToCar, 1:sendToRsu, 2:sendToGnb or 3:process]
+        nextLocation: [The location where the message will be sent to]
+    """    
+    pCarToCar = 0.05
+    pCarToRsu = 0.45
+    pCarToGnb = 0.45
     rand = random.random()
     if rand < pCarToCar:
         nearCar = car.getNearCar(currentTime, network)
