@@ -1,7 +1,10 @@
-
+from config import Config
 class Message:
     cnt = 0
-    def __init__(self, indexCar, time):
+    def __init__(self, indexCar, time, size=1, cpuCycle=1, ttl=Config.ttl):
+        self.size = size
+        self.cpuCycle = cpuCycle
+        self.ttl = ttl
         self.stt = Message.cnt 
         Message.cnt += 1
         self.indexCar = [indexCar] 

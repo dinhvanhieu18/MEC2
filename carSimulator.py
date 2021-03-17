@@ -1,17 +1,32 @@
 import math
+import os
+import numpy as np
 from object import Object
 from message import Message
 from config import Config
-from carSimulator_method import getAction, getNearCar, getNearRsu
+from carSimulator_method import (
+    getPosition, distanceToCar, 
+    distanceToRsu, getAction
+)
 
 class CarSimulator(Object):
 
-    def __init__(self, id, startTime):
+    def __init__(self, id, startTime, optimizer=None):
         Object.__init__(self)
         self.id = id
         self.startTime = startTime
         self.numMessage = 0
         self.preReceiveFromGnb = 0.0
+        self.meanDelaySendToCar = 0.0
+        self.meanDelaySendToRsu = 0.0
+        self.meanDelaySendToGnb = 0.0
+        self.cntSendToCar = 0
+        self.cntSendToRsu = 0
+        self.cntSendToGnb = 0
+        self.cnt = 0
+        self.optimizer = optimizer
+        self.neighborCars = []
+        self.neighborRsu = None
 
     def collectMessages(self, currentTime, listTimeMessages):
         """Collect the messages in waitList which have the current time
@@ -28,15 +43,12 @@ class CarSimulator(Object):
         # If car isn't in road, return
         if self.getPosition(currentTime) > Config.roadLength:
             return []
-
         # Collect from waitList
         res = Object.collectMessages(self, currentTime)
-
         # Generate message
         if self.numMessage >= len(listTimeMessages):
             return res
         curTime = listTimeMessages[self.numMessage]
-
         while True:
             sendTime = self.startTime + curTime
             if sendTime > currentTime + Config.cycleTime:
@@ -47,7 +59,6 @@ class CarSimulator(Object):
             if (self.numMessage >= len(listTimeMessages)):
                 return res
             curTime = listTimeMessages[self.numMessage]
-
         return res
 
     def sendToCar(self, car, message, currentTime, network):
@@ -149,31 +160,14 @@ class CarSimulator(Object):
         else:
             network.addToHeap(message)
 
-    def getPosition(self, currentTime):
-        """Get the current position of the car
+    def getPosition(self, currentTime, func=getPosition):
+        return func(self, currentTime)
 
-        Args:
-            currentTime ([float]): [description]
+    def distanceToCar(self, car, currentTime, func=distanceToCar):
+        return func(self, car, currentTime)
 
-        Returns:
-            [float]: [description]
-        """        
-        return Config.carSpeed * (currentTime - self.startTime)
-
-    def distanceToCar(self, car, currentTime):
-        return abs(self.getPosition(currentTime) - car.getPosition(currentTime))
-
-    def distanceToRsu(self, rsu, currentTime):
-        position = self.getPosition(currentTime)
-        return math.sqrt(
-            pow(position - rsu.xcord, 2) + pow(rsu.ycord, 2) + pow(rsu.zcord, 2)
-        )   
-    
-    def getNearCar(self, currentTime, network, func=getNearCar):
-        return func(self, currentTime, network)
-
-    def getNearRsu(self, currentTime, network, func=getNearRsu):
-        return func(self, currentTime, network)
+    def distanceToRsu(self, rsu, currentTime, func=distanceToRsu):
+        return func(self, rsu, currentTime)
 
     def working(self, message, currentTime, network, getAction=getAction):
         if message.isDone:
@@ -181,12 +175,16 @@ class CarSimulator(Object):
             if startCar.getPosition(currentTime) > Config.roadLength or \
                 self.distanceToCar(startCar, currentTime) > Config.carCoverRadius:
                 message.isDropt = True
+            if message.isDropt or startCar.id == self.id:
                 network.output.append(message)
-            elif startCar.id == self.id:
-                network.output.append(message)
+                for car_id in message.indexCar:
+                    car = network.carList[car_id]
+                    car.optimizer.updateReward(message)
+                for rsu_id in message.indexRsu:
+                    rsu = network.rsuList[rsu_id]
+                    rsu.optimizer.updateReward(message)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
-            return
         else:
             action, nextLocation = getAction(self, message, currentTime, network)
             # 0: sendToCar, 1:sendToRsu, 2: sendToGnb, 3:process

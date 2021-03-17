@@ -1,45 +1,9 @@
 import random
+import numpy as np
+import math
 from config import Config
 
-def getNearCar(car, currentTime, network):
-    minDis = Config.roadLength
-    listRes = []
-    for car_ in network.carList:
-        if car_.id == car.id:
-            continue
-        if car_.startTime > currentTime:
-            continue
-        distance = car.distanceToCar(car_, currentTime)
-        if distance > Config.carCoverRadius:
-            continue
-        if distance < minDis:
-            minDis = distance
-            listRes = [car_]
-        elif distance == minDis:
-            listRes.append(car_)
-    if listRes:
-        return listRes[random.randint(0, len(listRes)-1)]
-    else:
-        return None 
-
-def getNearRsu(car, currentTime, network):
-    minDis = 10000000
-    listRes = []
-    for rsu in network.rsuList:
-        distance = car.distanceToRsu(rsu, currentTime)
-        if distance > Config.rsuCoverRadius:
-            continue
-        if distance < minDis:
-            minDis = distance
-            listRes = [rsu]
-        elif distance == minDis:
-            listRes.append(rsu)
-    if listRes:
-        return listRes[random.randint(0, len(listRes)-1)]
-    else:
-        return None
-
-def getAction(car, message, currentTime, network, optimizer=None):
+def getAction(car, message, currentTime, network):
     """Gat action of this car for the message
 
     Args:
@@ -47,30 +11,48 @@ def getAction(car, message, currentTime, network, optimizer=None):
         message ([Message]): [description]
         currentTime ([float]): [description]
         network ([Network]): [description]
-        optimizer ([type], optional): [description]. Defaults to None.
 
     Returns:
         action: [0:sendToCar, 1:sendToRsu, 2:sendToGnb or 3:process]
         nextLocation: [The location where the message will be sent to]
     """    
-    pCarToCar = 0.05
-    pCarToRsu = 0.45
-    pCarToGnb = 0.45
-    rand = random.random()
-    if rand < pCarToCar:
-        nearCar = car.getNearCar(currentTime, network)
-        if nearCar:
-            return (0, nearCar)
+    # 0: car, 1:rsu, 2:gnb, 3:process
+    stateInfo = car.optimizer.getState(message)
+    car.optimizer.updateState(message)
+    currentState = np.reshape(stateInfo[0], (1, len(stateInfo[0])))
+    allActionValues = car.optimizer.onlineModel.predict(currentState)
+    actionByPolicy = car.optimizer.policy(allActionValues)
+    if actionByPolicy == 0:
+        if stateInfo[1]:
+            res = (0, stateInfo[1])
+        elif stateInfo[2]:
+            res = (1, stateInfo[2])
         else:
-            return (2, network.gnb)
-    elif rand < pCarToCar + pCarToRsu:
-        nearRsu = car.getNearRsu(currentTime, network)
-        if nearRsu:
-            return (1, nearRsu)
+            res = (2, network.gnb)
+    elif actionByPolicy == 1:
+        if stateInfo[2]:
+            res = (1, stateInfo[2])
         else:
-            return (2, network.gnb)
-    elif rand < pCarToCar + pCarToRsu + pCarToGnb:
-        return (2, network.gnb)
+            res = (2, network.gnb)
+    elif actionByPolicy == 2:
+        res = (2, network.gnb)
     else:
-        return (3, None)
+        res = (3, None)
+    experience = [currentState, res[0], None, None]
+    car.optimizer.addToMemoryTmp(experience, message)
+    car.optimizer.update()
+    return res
+
+
+def getPosition(car, currentTime):    
+    return Config.carSpeed * (currentTime - car.startTime)
+
+def distanceToCar(car1, car2, currentTime):
+    return abs(car1.getPosition(currentTime) - car2.getPosition(currentTime))
+
+def distanceToRsu(car, rsu, currentTime):
+    position = car.getPosition(currentTime)
+    return math.sqrt(
+        pow(position - rsu.xcord, 2) + pow(rsu.ycord, 2) + pow(rsu.zcord, 2)
+    )  
 

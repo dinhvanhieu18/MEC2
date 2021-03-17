@@ -14,6 +14,8 @@ def dumpOutputPerCycle(network, currentTime):
             network.meanDelay += delay
         mes.setType()
         f.write(f"{mes.sendTime[0]} \t {mes.currentTime} \t {delay} \t {mes.type} \t {network.maxDelay} \n")
+        # Update infor of car, rsu
+        process(mes)
     network.output = []
 
 def dumpOutputFinal(network):
@@ -25,3 +27,6 @@ def dumpOutputFinal(network):
         {network.totalOutsize} \n")
     f.close()
     print("Done dumping final output!!!") 
+
+def process(message):
+    pass

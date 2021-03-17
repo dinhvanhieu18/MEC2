@@ -2,20 +2,29 @@ import math
 from object import Object
 from message import Message
 from config import Config
-from rsuSimulator_method import getAction, getNearCar, getNearRsu
+from rsuSimulator_method import (
+    getAction, distanceToCar, distanceToRsu
+)
 
 class RsuSimulator(Object):
 
-    def __init__(self, id, xcord, ycord, zcord):
+    def __init__(self, id, xcord, ycord, zcord, optimizer=None):
         Object.__init__(self)
         self.id = id
         self.xcord = xcord
         self.ycord = ycord
         self.zcord = zcord
-        self.nearRsuList = []
+        self.meanDelaySendToRsu = 0.0
+        self.meanDelaySendToGnb = 0.0
+        self.cntSendToRsu = 0
+        self.cntSendToGnb = 0
+        self.cnt = 0
+        self.optimizer = optimizer
+        self.neighbors = []
+
 
     def sendToCar(self, car, message, currentTime, network):
-        """Simualte send message from rsu to car
+        """Simulate send message from rsu to car
 
         Args:
             car ([CarSimulator]): [description]
@@ -113,23 +122,11 @@ class RsuSimulator(Object):
         else:
             network.addToHeap(message)
 
-    def distanceToCar(self, car, currentTime):
-        positionCar = car.getPosition(currentTime)
-        return math.sqrt(
-            pow(positionCar - self.xcord, 2) + pow(self.ycord, 2) + pow(self.zcord, 2)
-        )
+    def distanceToCar(self, car, currentTime, func=distanceToCar):
+        return func(self, car, currentTime)
 
-    def distanceToRsu(self, rsu):
-        return math.sqrt(
-            pow(self.xcord - rsu.xcord, 2) + \
-            pow(self.ycord - rsu.ycord, 2) + \
-            pow(self.zcord - rsu.zcord, 2))     
-    
-    def getNearCar(self, currentTime, network, func=getNearCar):
-        func(self, currentTime, network)
-
-    def getNearRsu(self, func=getNearRsu):
-        func(self)
+    def distanceToRsu(self, rsu, func=distanceToRsu):
+        return func(self, rsu)  
 
     def working(self, message, currentTime, network, getAction=getAction):
         if message.isDone:
@@ -138,17 +135,20 @@ class RsuSimulator(Object):
                 self.distanceToCar(startCar, currentTime) > Config.rsuCoverRadius:
                 message.isDropt = True
                 network.output.append(message)
+                for car_id in message.indexCar:
+                    car = network.carList[car_id]
+                    car.optimizer.updateReward(message)
+                for rsu_id in message.indexRsu:
+                    rsu = network.rsuList[rsu_id]
+                    rsu.optimizer.updateReward(message)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
-            return
         else:
             action, nextLocation = getAction(self, message, currentTime, network)
-            # 0: sendToCar, 1:sendToRsu, 2: sendToGnb, 3:process
+            # 0: sendToRsu, 1:sendToGnb, 2:process
             if action == 0: 
-                self.sendToCar(nextLocation, message, currentTime, network)
-            elif action == 1:
                 self.sendToRsu(nextLocation, message, currentTime, network)
-            elif action == 2:
+            elif action == 1:
                 self.sendToGnb(nextLocation, message, currentTime, network)
             else:
                 self.process(message, currentTime, network)

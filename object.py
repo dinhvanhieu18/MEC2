@@ -8,6 +8,10 @@ class Object:
         self.preProcess = 0.0
         self.preReceiveFromCar = 0.0
         self.preReceiveFromRsu = 0.0
+        self.meanDelay = 0.0
+        self.meanDelayProcess = 0.0
+        self.cntProcess = 0
+        self.cnt = 0    
 
     def collectMessages(self, currentTime):
         """Collect the messages in waitList which have the current time
@@ -41,7 +45,7 @@ class Object:
         message.sendTime.append(message.currentTime)
 
         #  calculate tranfer time and receive time
-        tranferTime = getNext(1.0/meanTranfer)
+        tranferTime = getNext(1.0/meanTranfer) * message.size
         selectedTime = max(preReceive, message.currentTime)
         receiveTime = tranferTime + selectedTime
 
@@ -58,7 +62,7 @@ class Object:
         """        
         # calculate process time
         selectedTime = max(message.currentTime, self.preProcess)
-        processTime = getNext(processPerSecond)
+        processTime = getNext(processPerSecond) * message.cpuCycle
         processedTime = selectedTime + processTime
 
         # Change currentTime of message and set is done

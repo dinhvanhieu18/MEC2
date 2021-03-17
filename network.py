@@ -15,17 +15,12 @@ class Network:
         self.countDropt = 0
         self.totalOutsize = 0
         self.maxDelay = 0
-        self.setNearRsuList()
+        self.setNeighborRsu()
 
-    def setNearRsuList(self):
-        for i in range(len(self.rsuList)):
-            for j in range(i, len(self.rsuList)):
-                distance = self.rsuList[i].distanceToRsu(self.rsuList[j])
-                if distance > Config.rsuCoverRadius:
-                    continue
-                else:
-                    self.rsuList[i].nearRsuList.append(self.rsuList[j])
-                    self.rsuList[j].nearRsuList.append(self.rsuList[i])
+    def setNeighborRsu(self):
+        for i, rsu in enumerate(self.rsuList):
+            rsu.neighbors = self.rsuList
+            del rsu.neighbors[i]
 
     def collectMessages(self, currentTime):
         res = []
@@ -44,7 +39,30 @@ class Network:
             priority=(message.currentTime,message.stt),
             item=message))
 
+    def setNeighborCar(self, car, currentTime):
+        # Set neighbor car
+        car.neighborCars = []
+        for car_ in self.carList:
+            if car_.id == car.id:
+                continue
+            distance = car.distanceToCar(car_, currentTime)
+            if distance < Config.carCoverRadius:
+                car.neighborCars.append(car_)
+        # Set neighbor rsu
+        minDistance = Config.rsuCoverRadius
+        neighborRsu = None
+        for rsu in self.rsuList:
+            distance = car.distanceToRsu(rsu, currentTime)
+            if distance < minDistance:
+                minDistance = distance
+                neighborRsu = rsu
+        car.neighborRsu = neighborRsu                
+
     def working(self, currentTime):
+        # Set neighbor list for this cars
+        for car in self.carList:
+            self.setNeighborCar(car, currentTime)
+
         self.collectMessages(currentTime)
         while not self.q.empty():
             mes = self.q.get().item
@@ -61,7 +79,7 @@ class Network:
                 rsu = self.rsuList[mes.indexRsu[-1]]
                 rsu.working(mes, currentTime, self)
             else:
-                self.gnb.process(mes, currentTime, self)
+                self.gnb.working(mes, currentTime, self)
 
     def run(self):
         currentTime = 0

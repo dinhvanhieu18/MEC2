@@ -32,7 +32,7 @@ class GnbSimulator(Object):
             car.waitList.append(message)
         # Add to output
         else:
-            network.output.append(message)
+            network.addToHeap(message)
 
     def process(self, message, currentTime,network):
         # Simulate process time
@@ -43,12 +43,22 @@ class GnbSimulator(Object):
         if message.currentTime > currentTime + Config.cycleTime:
             self.waitList.append(message)
         else:
+            network.addToHeap(message)
+        
+    def working(self, message, currentTime, network):
+        if message.isDone:
             startCar = network.carList[message.indexCar[0]]
             if startCar.getPosition(currentTime) > Config.roadLength:
                 message.isDropt = True
                 network.output.append(message)
+                for car_id in message.indexCar:
+                    car = network.carList[car_id]
+                    car.optimizer.updateReward(message)
+                for rsu_id in message.indexRsu:
+                    rsu = network.rsuList[rsu_id]
+                    rsu.optimizer.updateReward(message)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
-        
-
+        else:
+            self.process(message, currentTime, network)
 

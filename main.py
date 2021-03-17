@@ -2,6 +2,8 @@ from network import Network
 from carSimulator import CarSimulator
 from rsuSimulator import RsuSimulator
 from gnbSimulator import GnbSimulator
+from optimizers.carDQN import CarDQN
+from optimizers.rsuDQN import RsuDQN
 from config import Config
 
 def main():
@@ -28,6 +30,8 @@ def getRsuList():
             ycord=Config.yList[i],
             zcord=Config.zList[i],
         )
+        optimizer = RsuDQN(rsu=rsu)
+        rsu.optimizer = optimizer
         res.append(rsu)
     return res
 
@@ -61,6 +65,8 @@ def carAppear():
         if timeStartCar > Config.simTime:
             return res
         car = CarSimulator(index, timeStartCar)
+        optimizer = CarDQN(car=car)
+        car.optimizer = optimizer
         res.append(car)
         index += 1
         currentTime = timeStartCar
@@ -68,3 +74,16 @@ def carAppear():
 
 if __name__=="__main__":
     main()
+    # res = prepareTimeMessages()
+    # print(len(res))
+    # i = 1
+    # j = 0
+    # cnt = 0
+    # while j < len(res):
+    #     if res[j] < i:
+    #         cnt +=1
+    #     else:
+    #         print(cnt)
+    #         cnt = 0
+    #         i += 1
+    #     j += 1

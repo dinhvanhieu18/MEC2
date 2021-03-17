@@ -1,64 +1,48 @@
 import random
+import numpy as np
+import math
 from config import Config
-# from optimizer import optimizer
 
-def getNearCar(rsu, currentTime, network):
-    minDis = 10000000
-    listRes = []
-    for car in network.carList:
-        if car.startTime > currentTime:
-            continue
-        distance = rsu.distanceToCar(car, currentTime)
-        if distance > Config.rsuCoverRadius:
-            continue
-        if distance < minDis:
-            minDis = distance
-            listRes = [car]
-        elif distance == minDis:
-            listRes.append(car)
-    if listRes:
-        return listRes[random.randint(0, len(listRes)-1)]
+def getAction(rsu, message, currentTime, network):
+
+    # action = random.randint(0,2)
+    # if action == 0:
+    #     while True:
+    #         neighbor = network.rsuList[random.randint(0, len(network.rsuList)-1)]
+    #         if neighbor.id != rsu.id:
+    #             break
+    #     return (0, neighbor)
+    # elif action == 1:
+    #     return (1, network.gnb)
+    # else:
+    #     return (2, None)
+    # 0: sendToRsu 
+    stateInfo = rsu.optimizer.getState(message)
+    rsu.optimizer.updateState(message)
+    currentState = np.reshape(stateInfo[0], (1, len(stateInfo[0])))
+    allActionValues = rsu.optimizer.onlineModel.predict(currentState)
+    actionByPolicy = rsu.optimizer.policy(allActionValues)
+    if actionByPolicy == 0:
+        res = (0, stateInfo[1])
+    elif actionByPolicy == 1:
+        res = (1, network.gnb)
     else:
-        return None 
+        res = (2, None)
+    experience = [currentState, res[0], None, None]
+    rsu.optimizer.addToMemoryTmp(experience, message)
+    rsu.optimizer.update()
+    return res
 
-def getNearRsu(rsu):
-    if rsu.nearRsuList:
-        return rsu.nearRsuList[random.randint(0, len(rsu.nearRsuList)-1)]
-    else:
-        return None
+def distanceToCar(rsu, car, currentTime):
+    positionCar = car.getPosition(currentTime)
+    return math.sqrt(
+        pow(positionCar - rsu.xcord, 2) + \
+        pow(rsu.ycord, 2) + pow(rsu.zcord, 2))
 
-def getAction(rsu, message, currentTime, network, optimizer=None):
-    """Gat action of this rsu for the message
 
-    Args:
-        rsu ([RsuSimulator]): [description]
-        message ([Message]): [description]
-        currentTime ([float]): [description]
-        network ([Network]): [description]
-        optimizer ([type], optional): [description]. Defaults to None.
-
-    Returns:
-        action: [0:sendToCar, 1:sendToRsu, 2:sendToGnb or 3:process]
-        nextLocation: [The location where the message will be sent to]
-    """
-    pRsuToCar = 0.05
-    pRsuToRsu = 0.05
-    pRsuToGnb = 0.45
-    rand = random.random()
-    if rand < pRsuToCar:
-        nearCar = rsu.getNearCar(currentTime, network)
-        if nearCar:
-            return (0, nearCar)
-        else:
-            return (2, network.gnb)
-    elif rand < pRsuToCar + pRsuToRsu:
-        nearRsu = rsu.getNearRsu()
-        if nearRsu:
-            return (1, nearRsu)
-        else:
-            return (2, network.gnb)
-    elif rand < pRsuToCar + pRsuToRsu + pRsuToGnb:
-        return (2, network.gnb)
-    else:
-        return (3, None)
+def distanceToRsu(rsu, rsu_):
+    return math.sqrt(
+        pow(rsu.xcord - rsu_.xcord, 2) + \
+        pow(rsu.ycord - rsu_.ycord, 2) + \
+        pow(rsu.zcord - rsu_.zcord, 2)) 
 
