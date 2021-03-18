@@ -99,10 +99,15 @@ def updateReward(rsuDQN, message):
                 # print(stateInfo)
                 # print(len(rsuDQN.memory.memoryTmp))
                 # rsuDQN.memory.memoryTmp.remove(stateInfo)
-                del rsuDQN.memory.memoryTmp[i]
-                print("Delete state after update reward")
-                print("Len memory Tmp:",len(rsuDQN.memory.memoryTmp))
+                rsuDQN.memory.memoryTmp[i] = None
                 # print(len(rsuDQN.memory.memoryTmp))
+
+    tmp = []
+    for stateInfo in rsuDQN.memory.memoryTmp:
+        if stateInfo is not None:
+            tmp.append(stateInfo)
+    rsuDQN.memory.memoryTmp = tmp
+    print("Len memory Tmp:",len(rsuDQN.memory.memoryTmp))
     print(rsuDQN.memory.memoryTmp)
 
 def addToMemoryTmp(rsuDQN, experience, message):

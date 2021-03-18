@@ -51,6 +51,6 @@ class Config:
     simTime = 30
     cycleTime = 1.0
     roadLength = 1500
-    dumpDelayDetail = "/home/hieu/Desktop/20202/MEC2/result/delayDetail.txt"
-    dumDelayGeneral = "/home/hieu/Desktop/20202/MEC2/result/delayGeneral.txt"
+    dumpDelayDetail = "/home/hieu/Desktop/20202/MEC2/results/delayDetail.txt"
+    dumDelayGeneral = "/home/hieu/Desktop/20202/MEC2/results/delayGeneral.txt"
     weightsDir = "/home/hieu/Desktop/2020/MEC2/weights"

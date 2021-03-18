@@ -1,6 +1,6 @@
 inputFiles/*
 *.pyc
 tests/*
-result/*
+results/*
 weights/*
 Note.txt

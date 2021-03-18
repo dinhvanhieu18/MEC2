@@ -9,6 +9,7 @@ from config import Config
 def main():
     gnb = GnbSimulator()
     rsuList= getRsuList()
+    print(len(rsuList))
     carList = carAppear()
     print(len(carList))
     listTimeMessages = prepareTimeMessages()

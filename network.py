@@ -19,8 +19,10 @@ class Network:
 
     def setNeighborRsu(self):
         for i, rsu in enumerate(self.rsuList):
-            rsu.neighbors = self.rsuList
-            del rsu.neighbors[i]
+            for j, rsu_ in enumerate(self.rsuList):
+                if j == i:
+                    continue
+                rsu.neighbors.append(rsu_)
 
     def collectMessages(self, currentTime):
         res = []
