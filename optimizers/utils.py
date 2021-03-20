@@ -1,14 +1,6 @@
 from collections import deque
 import random
 
-def calculateTaskInQueue(obj):
-    res = 0
-    for mes in obj.waitList:
-        if mes.isDone:
-            continue
-        res += mes.cpuCycle
-    return res
-
 class SequentialDequeMemory:
     def __init__(self, queueCapacity=2000):
         self.queueCapacity = 2000

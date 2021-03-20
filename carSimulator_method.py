@@ -2,6 +2,51 @@ import random
 import numpy as np
 import math
 from config import Config
+from utils import calculateTaskInQueue
+
+def getNeighborCarInfo(car):
+    def sortFunc(e):
+        return e[0] * e[1]
+    tmp = []
+    for car_ in car.neighborCars:
+        expectedTime = calculateTaskInQueue(car_) / Config.carProcessPerSecond
+        tmp.append((expectedTime, car_.meanDelay, car_))
+    tmp.sort(key=sortFunc)
+    if not tmp:
+        return (0.0, 0.0, None)
+    rand = random.random()
+    if rand < 0.5:
+        return tmp[0]
+    else:
+        return tmp[random.randint(0, len(tmp)-1)] 
+    
+def getNeighborRsuInfo(car):
+    neighborRsu = car.neighborRsu
+    if neighborRsu:
+        expectedTime = calculateTaskInQueue(neighborRsu) / Config.rsuProcessPerSecond
+        return (expectedTime, neighborRsu.meanDelay, neighborRsu)
+    else:
+        return (0.0, 0.0, None)
+
+def getState(car, message):
+    # Info of this message
+    res = [message.size, message.cpuCycle]
+    # Info of this car
+    res.append(calculateTaskInQueue(car))
+    res.append(car.meanDelayProcess)
+    res.append(car.meanDelaySendToCar)
+    res.append(car.meanDelaySendToRsu)
+    res.append(car.meanDelaySendToGnb)
+    # Info of it's neighbor car
+    neighborCarInfo = getNeighborCarInfo(car)
+    res.append(neighborCarInfo[0])
+    res.append(neighborCarInfo[1])
+    # Info of it's neighbor rsu
+    neighborRsuInfo = getNeighborRsuInfo(car)
+    res.append(neighborRsuInfo[0])
+    res.append(neighborRsuInfo[1])
+    res = np.reshape(res, (1, len(res)))
+    return (res, neighborCarInfo[2], neighborRsuInfo[2])
 
 def getAction(car, message, currentTime, network):
     """Gat action of this car for the message
@@ -17,23 +62,26 @@ def getAction(car, message, currentTime, network):
         nextLocation: [The location where the message will be sent to]
     """    
     # 0: car, 1:rsu, 2:gnb, 3:process
-    stateInfo = car.optimizer.getState(message)
-    car.optimizer.updateState(message)
-    currentState = np.reshape(stateInfo[0], (1, len(stateInfo[0])))
-    allActionValues = car.optimizer.onlineModel.predict(currentState)
-    actionByPolicy = car.optimizer.policy(allActionValues)
+    stateInfo = getState(car, message)
+    currentState = stateInfo[0]
+    neighborCar = stateInfo[1]
+    neighborRsu = stateInfo[2]
+    # Update state
+    car.optimizer.updateState(message, currentState)
+    # get values of all actions
+    allActionValues = car.optimizer.onlineModel.predict(currentState)[0]
+    # exclude actions can't choose
+    exclude_actions = []
+    if neighborCar is None or len(message.indexCar) >= 2:
+        exclude_actions.append(0)
+    if neighborRsu is None:
+        exclude_actions.append(1)
+    # get action by policy
+    actionByPolicy = car.optimizer.policy(allActionValues, exclude_actions)
     if actionByPolicy == 0:
-        if stateInfo[1]:
-            res = (0, stateInfo[1])
-        elif stateInfo[2]:
-            res = (1, stateInfo[2])
-        else:
-            res = (2, network.gnb)
+        res = (0, neighborCar)
     elif actionByPolicy == 1:
-        if stateInfo[2]:
-            res = (1, stateInfo[2])
-        else:
-            res = (2, network.gnb)
+        res = (1, neighborRsu)
     elif actionByPolicy == 2:
         res = (2, network.gnb)
     else:

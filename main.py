@@ -2,13 +2,14 @@ from network import Network
 from carSimulator import CarSimulator
 from rsuSimulator import RsuSimulator
 from gnbSimulator import GnbSimulator
-from optimizers.carDQN import CarDQN
-from optimizers.rsuDQN import RsuDQN
+from optimizers.DQN import DQN
 from config import Config
+import os
 
 def main():
     gnb = GnbSimulator()
     rsuList= getRsuList()
+    print(len(rsuList))
     carList = carAppear()
     print(len(carList))
     listTimeMessages = prepareTimeMessages()
@@ -29,9 +30,12 @@ def getRsuList():
             xcord=Config.xList[i],
             ycord=Config.yList[i],
             zcord=Config.zList[i],
+            optimizer=DQN(
+                agent_name=f"rsu_{i}", 
+                n_states=Config.nStatesRsu, 
+                n_actions=Config.nActionsRsu,
+            )
         )
-        optimizer = RsuDQN(rsu=rsu)
-        rsu.optimizer = optimizer
         res.append(rsu)
     return res
 
@@ -64,26 +68,24 @@ def carAppear():
         timeStartCar = currentTime + tmp
         if timeStartCar > Config.simTime:
             return res
-        car = CarSimulator(index, timeStartCar)
-        optimizer = CarDQN(car=car)
-        car.optimizer = optimizer
+        car = CarSimulator(
+            id=index, 
+            startTime=timeStartCar,
+            optimizer=DQN(
+                agent_name=f"car_{index}",
+                n_states=Config.nStatesCar,
+                n_actions=Config.nActionsCar,
+            )
+        )
         res.append(car)
         index += 1
         currentTime = timeStartCar
     return res
 
+
 if __name__=="__main__":
+    if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
+        os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
+    if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
+        os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
     main()
-    # res = prepareTimeMessages()
-    # print(len(res))
-    # i = 1
-    # j = 0
-    # cnt = 0
-    # while j < len(res):
-    #     if res[j] < i:
-    #         cnt +=1
-    #     else:
-    #         print(cnt)
-    #         cnt = 0
-    #         i += 1
-    #     j += 1

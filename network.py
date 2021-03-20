@@ -12,15 +12,17 @@ class Network:
         self.q = PriorityQueue()
         self.output = []
         self.meanDelay = 0.0
-        self.countDropt = 0
+        self.countDrop = 0
         self.totalOutsize = 0
         self.maxDelay = 0
         self.setNeighborRsu()
 
     def setNeighborRsu(self):
         for i, rsu in enumerate(self.rsuList):
-            rsu.neighbors = self.rsuList
-            del rsu.neighbors[i]
+            for j, rsu_ in enumerate(self.rsuList):
+                if j == i:
+                    continue
+                rsu.neighbors.append(rsu_)
 
     def collectMessages(self, currentTime):
         res = []

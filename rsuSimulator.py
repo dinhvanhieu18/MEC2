@@ -5,6 +5,7 @@ from config import Config
 from rsuSimulator_method import (
     getAction, distanceToCar, distanceToRsu
 )
+from utils import update
 
 class RsuSimulator(Object):
 
@@ -14,11 +15,6 @@ class RsuSimulator(Object):
         self.xcord = xcord
         self.ycord = ycord
         self.zcord = zcord
-        self.meanDelaySendToRsu = 0.0
-        self.meanDelaySendToGnb = 0.0
-        self.cntSendToRsu = 0
-        self.cntSendToGnb = 0
-        self.cnt = 0
         self.optimizer = optimizer
         self.neighbors = []
 
@@ -133,14 +129,9 @@ class RsuSimulator(Object):
             startCar = network.carList[message.indexCar[0]]
             if startCar.getPosition(currentTime) > Config.roadLength or \
                 self.distanceToCar(startCar, currentTime) > Config.rsuCoverRadius:
-                message.isDropt = True
+                message.isDrop = True
                 network.output.append(message)
-                for car_id in message.indexCar:
-                    car = network.carList[car_id]
-                    car.optimizer.updateReward(message)
-                for rsu_id in message.indexRsu:
-                    rsu = network.rsuList[rsu_id]
-                    rsu.optimizer.updateReward(message)
+                update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:

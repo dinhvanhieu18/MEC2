@@ -2,6 +2,7 @@ import math
 from object import Object
 from message import Message
 from config import Config
+from utils import update
 
 class GnbSimulator(Object):
 
@@ -49,14 +50,15 @@ class GnbSimulator(Object):
         if message.isDone:
             startCar = network.carList[message.indexCar[0]]
             if startCar.getPosition(currentTime) > Config.roadLength:
-                message.isDropt = True
+                message.isDrop = True
                 network.output.append(message)
-                for car_id in message.indexCar:
-                    car = network.carList[car_id]
-                    car.optimizer.updateReward(message)
-                for rsu_id in message.indexRsu:
-                    rsu = network.rsuList[rsu_id]
-                    rsu.optimizer.updateReward(message)
+                # for car_id in message.indexCar:
+                #     car = network.carList[car_id]
+                #     car.optimizer.updateReward(message)
+                # for rsu_id in message.indexRsu:
+                #     rsu = network.rsuList[rsu_id]
+                #     rsu.optimizer.updateReward(message)
+                update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:

@@ -14,7 +14,7 @@ class Message:
         self.locations = [0] # locations 0: car, 1:rsu, 2:gnb
         self.currentTime = time
         self.isDone = False
-        self.isDropt = False
+        self.isDrop = False
         self.type = ""
 
     def setType(self):
