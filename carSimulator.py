@@ -8,6 +8,7 @@ from carSimulator_method import (
     getPosition, distanceToCar, 
     distanceToRsu, getAction
 )
+from utils import update
 
 class CarSimulator(Object):
 
@@ -16,14 +17,6 @@ class CarSimulator(Object):
         self.id = id
         self.startTime = startTime
         self.numMessage = 0
-        self.preReceiveFromGnb = 0.0
-        self.meanDelaySendToCar = 0.0
-        self.meanDelaySendToRsu = 0.0
-        self.meanDelaySendToGnb = 0.0
-        self.cntSendToCar = 0
-        self.cntSendToRsu = 0
-        self.cntSendToGnb = 0
-        self.cnt = 0
         self.optimizer = optimizer
         self.neighborCars = []
         self.neighborRsu = None
@@ -174,15 +167,10 @@ class CarSimulator(Object):
             startCar = network.carList[message.indexCar[0]]
             if startCar.getPosition(currentTime) > Config.roadLength or \
                 self.distanceToCar(startCar, currentTime) > Config.carCoverRadius:
-                message.isDropt = True
-            if message.isDropt or startCar.id == self.id:
+                message.isDrop = True
+            if message.isDrop or startCar.id == self.id:
                 network.output.append(message)
-                for car_id in message.indexCar:
-                    car = network.carList[car_id]
-                    car.optimizer.updateReward(message)
-                for rsu_id in message.indexRsu:
-                    rsu = network.rsuList[rsu_id]
-                    rsu.optimizer.updateReward(message)
+                update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:

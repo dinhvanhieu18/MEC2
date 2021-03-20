@@ -12,7 +12,7 @@ class Network:
         self.q = PriorityQueue()
         self.output = []
         self.meanDelay = 0.0
-        self.countDropt = 0
+        self.countDrop = 0
         self.totalOutsize = 0
         self.maxDelay = 0
         self.setNeighborRsu()

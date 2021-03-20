@@ -6,6 +6,3 @@ class Optimizer:
 
     def update(self):
         pass
-
-    def getAction(self):
-        pass

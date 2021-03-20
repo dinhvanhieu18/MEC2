@@ -2,28 +2,55 @@ import random
 import numpy as np
 import math
 from config import Config
+from utils import calculateTaskInQueue
+
+def getNeighborRsu(rsu):
+    def sortFunc(e):
+        return e[0] * e[1]
+    tmp = []
+    for rsu_ in rsu.neighbors:
+        expectedTime = calculateTaskInQueue(rsu_) / Config.rsuProcessPerSecond
+        tmp.append((expectedTime, rsu_.meanDelay, rsu_))
+    tmp.sort(key=sortFunc)
+    rand = random.random()
+    if rand < 0.5:
+        return tmp[0]
+    else:
+        return tmp[random.randint(0, len(tmp)-1)] 
+
+
+def getState(rsu, message):
+    # Info of this message
+    res = [message.size, message.cpuCycle]
+    # Info of this rsu
+    res.append(calculateTaskInQueue(rsu))
+    res.append(rsu.meanDelayProcess)
+    res.append(rsu.meanDelaySendToRsu)
+    res.append(rsu.meanDelaySendToGnb)
+    # Info of it's neighbor rsu
+    neighborRsuInfo = getNeighborRsu(rsu)
+    res.append(neighborRsuInfo[0])
+    res.append(neighborRsuInfo[1])
+    res = np.reshape(res, (1, len(res)))
+    return (res, neighborRsuInfo[2])
 
 def getAction(rsu, message, currentTime, network):
-
-    # action = random.randint(0,2)
-    # if action == 0:
-    #     while True:
-    #         neighbor = network.rsuList[random.randint(0, len(network.rsuList)-1)]
-    #         if neighbor.id != rsu.id:
-    #             break
-    #     return (0, neighbor)
-    # elif action == 1:
-    #     return (1, network.gnb)
-    # else:
-    #     return (2, None)
-    # 0: sendToRsu 
-    stateInfo = rsu.optimizer.getState(message)
-    rsu.optimizer.updateState(message)
-    currentState = np.reshape(stateInfo[0], (1, len(stateInfo[0])))
-    allActionValues = rsu.optimizer.onlineModel.predict(currentState)
-    actionByPolicy = rsu.optimizer.policy(allActionValues)
+    # 0: rsu, 1: gnb, 2: process
+    stateInfo = getState(rsu, message)
+    currentState = stateInfo[0]
+    neighborRsu = stateInfo[1]
+    # Update state
+    rsu.optimizer.updateState(message, currentState)
+    # get values of all actions
+    allActionValues = rsu.optimizer.onlineModel.predict(currentState)[0]
+    # exclude actions can't choose
+    exclude_actions = []
+    if len(message.indexRsu) >= 2:
+        exclude_actions.append(0)
+    # get action by policy
+    actionByPolicy = rsu.optimizer.policy(allActionValues, exclude_actions)
     if actionByPolicy == 0:
-        res = (0, stateInfo[1])
+        res = (0, neighborRsu)
     elif actionByPolicy == 1:
         res = (1, network.gnb)
     else:
