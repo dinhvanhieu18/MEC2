@@ -112,10 +112,15 @@ def updateReward(carDQN, message):
                 # print(stateInfo)
                 # print(len(carDQN.memory.memoryTmp))
                 # carDQN.memory.memoryTmp.remove(stateInfo)
-                del carDQN.memory.memoryTmp[i]
-                print("Delete state after update reward")
-                print("Len memory Tmp:",len(carDQN.memory.memoryTmp))
+                carDQN.memory.memoryTmp[i] = None
+                
                 # print(len(carDQN.memory.memoryTmp))
+    tmp = []
+    for stateInfo in carDQN.memory.memoryTmp:
+        if stateInfo is not None:
+            tmp.append(stateInfo)
+    carDQN.memory.memoryTmp = tmp
+    print("Len memory Tmp:",len(carDQN.memory.memoryTmp))
     print(carDQN.memory.memoryTmp)
 
 def addToMemoryTmp(carDQN, experience, message):
