@@ -22,7 +22,7 @@ class DQN(Optimizer):
         self.memory = SequentialDequeMemory(Config.queueCapacity)
         self.cnt = 0
         self.model_file = f"{os.getcwd()}/{Config.weightsFolder}/{agent_name}.h5"
-        self.loadModelWeights()
+        # self.loadModelWeights()
 
     def updateOnlineModel(self, experiences):
         X_train = []

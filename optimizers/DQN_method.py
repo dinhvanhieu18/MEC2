@@ -38,7 +38,7 @@ def updateState(DQN, message, currentState):
             DQN.cnt += 1
 
     print("Len memory Tmp:", len(DQN.memory.memoryTmp))
-    print(DQN.memory.memoryTmp)
+    # print(DQN.memory.memoryTmp)
 
 def updateReward(DQN, message, delay):
     print("Update Reward {} with message id {}".format(DQN.agent_name, message.stt))
@@ -56,7 +56,7 @@ def updateReward(DQN, message, delay):
             break
     
     print("Len memory Tmp:",len(DQN.memory.memoryTmp))
-    print(DQN.memory.memoryTmp)
+    # print(DQN.memory.memoryTmp)
 
 def addToMemoryTmp(DQN, experience, message):
     DQN.memory.addToMemoryTmp([experience, message.stt])

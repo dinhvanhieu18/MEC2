@@ -1,10 +1,11 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 from network import Network
 from carSimulator import CarSimulator
 from rsuSimulator import RsuSimulator
 from gnbSimulator import GnbSimulator
 from optimizers.DQN import DQN
 from config import Config
-import os
 
 def main():
     gnb = GnbSimulator()
@@ -84,8 +85,13 @@ def carAppear():
 
 
 if __name__=="__main__":
+    from datetime import datetime
+    start = datetime.now()
     if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
         os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
     if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
         os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
     main()
+    end = datetime.now()
+    print(start)
+    print(end)
