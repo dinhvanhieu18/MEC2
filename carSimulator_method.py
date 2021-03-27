@@ -13,6 +13,7 @@ def getNeighborCarInfo(car):
         tmp.append((expectedTime, car_.meanDelay, car_))
     tmp.sort(key=sortFunc)
     if not tmp:
+        # print("Don't has neighbor car")
         return (0.0, 0.0, None)
     rand = random.random()
     if rand < 0.5:
@@ -26,9 +27,13 @@ def getNeighborRsuInfo(car):
         expectedTime = calculateTaskInQueue(neighborRsu) / Config.rsuProcessPerSecond
         return (expectedTime, neighborRsu.meanDelay, neighborRsu)
     else:
+        print("Don't has neighbor rsu")
+        input()
         return (0.0, 0.0, None)
 
 def getState(car, message):
+    # print("car_{} get state for message id {}".format(car.id, message.stt))
+    # print("len waitList of this car {}".format(len(car.waitList)))
     # Info of this message
     res = [message.size, message.cpuCycle]
     # Info of this car
@@ -46,6 +51,7 @@ def getState(car, message):
     res.append(neighborRsuInfo[0])
     res.append(neighborRsuInfo[1])
     res = np.reshape(res, (1, len(res)))
+    # print(res)
     return (res, neighborCarInfo[2], neighborRsuInfo[2])
 
 def getAction(car, message, currentTime, network):

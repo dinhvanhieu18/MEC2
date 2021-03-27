@@ -27,6 +27,9 @@ class Network:
     def collectMessages(self, currentTime):
         res = []
         for car in self.carList:
+            if car.getPosition(currentTime) > Config.roadLength \
+            or car.startTime > currentTime:
+                continue
             res.append(car.collectMessages(
                 currentTime, self.listTimeMessages))
         for rsu in self.rsuList:
@@ -45,7 +48,8 @@ class Network:
         # Set neighbor car
         car.neighborCars = []
         for car_ in self.carList:
-            if car_.id == car.id:
+            if car_.getPosition(currentTime) > Config.roadLength \
+            or car_.startTime > currentTime or car_.id == car.id:
                 continue
             distance = car.distanceToCar(car_, currentTime)
             if distance < Config.carCoverRadius:
@@ -63,6 +67,10 @@ class Network:
     def working(self, currentTime):
         # Set neighbor list for this cars
         for car in self.carList:
+             # If car isn't in road, continue
+            if car.getPosition(currentTime) > Config.roadLength \
+            or car.startTime > currentTime:
+                continue
             self.setNeighborCar(car, currentTime)
 
         self.collectMessages(currentTime)

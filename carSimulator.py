@@ -33,9 +33,6 @@ class CarSimulator(Object):
         Returns:
             [list(Messages)]: [description]
         """        
-        # If car isn't in road, return
-        if self.getPosition(currentTime) > Config.roadLength:
-            return []
         # Collect from waitList
         res = Object.collectMessages(self, currentTime)
         # Generate message
