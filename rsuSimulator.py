@@ -126,6 +126,10 @@ class RsuSimulator(Object):
 
     def working(self, message, currentTime, network, getAction=getAction):
         if message.isDone:
+            rsu_id = message.indexRsu[0]
+            if rsu_id != self.id:
+                self.sendToRsu(network.rsuList[rsu_id], message, currentTime, network)
+                return
             startCar = network.carList[message.indexCar[0]]
             if startCar.getPosition(currentTime) > Config.roadLength or \
                 self.distanceToCar(startCar, currentTime) > Config.rsuCoverRadius:
@@ -137,9 +141,9 @@ class RsuSimulator(Object):
         else:
             action, nextLocation = getAction(self, message, currentTime, network)
             # 0: sendToRsu, 1:sendToGnb, 2:process
-            if action == 0: 
+            if action == 1: 
                 self.sendToRsu(nextLocation, message, currentTime, network)
-            elif action == 1:
+            elif action == 2:
                 self.sendToGnb(nextLocation, message, currentTime, network)
             else:
                 self.process(message, currentTime, network)
