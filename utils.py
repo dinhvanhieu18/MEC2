@@ -65,7 +65,7 @@ def update(message, network):
         else:
             obj = network.gnb
         if i == 0:
-            receiveTime = message.sendTime[0]
+            receiveTime = message.startTime
         else:
             index_list_receiveTime += 1
             receiveTime = message.receiveTime[index_list_receiveTime]
