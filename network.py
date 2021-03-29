@@ -55,6 +55,9 @@ class Network:
             if distance < Config.carCoverRadius:
                 car.neighborCars.append(car_)
         # Set neighbor rsu
+        if car.neighborRsu is not None:
+            if car.distanceToRsu(car.neighborRsu) <= Config.rsuCoverRadius:
+                return
         minDistance = Config.rsuCoverRadius
         neighborRsu = None
         for rsu in self.rsuList:
