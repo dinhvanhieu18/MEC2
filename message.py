@@ -9,9 +9,10 @@ class Message:
         Message.cnt += 1
         self.indexCar = [indexCar] 
         self.indexRsu = []
-        self.sendTime = [time]
+        self.sendTime = []
         self.receiveTime = []
         self.locations = [0] # locations 0: car, 1:rsu, 2:gnb
+        self.startTime = time
         self.currentTime = time
         self.isDone = False
         self.isDrop = False

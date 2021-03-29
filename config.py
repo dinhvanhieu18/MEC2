@@ -14,7 +14,7 @@ class Config:
     rsuCarMeanTranfer = 0.0004768371582
     rsuGnbMeanTranfer = 0.00004768371582
     nActionsRsu = 3
-    nStatesRsu = 8
+    nStatesRsu = 7
 
     # car config
     carSpeed = 12
@@ -24,17 +24,25 @@ class Config:
     carRsuMeanTranfer = 0.0009765625
     carGnbMeanTranfer = 0.0004768371582
     nActionsCar = 4
-    nStatesCar = 11
+    nStatesCar = 9
 
     # DQN
     hiddenLayerConfig = [16, 8]
-    policyParamaters = {"epsilon": 0.1}
+    policyParamaters = {"epsilon": 0.5}
     queueCapacity = 2000
     batchSize = 16
     learningRate = 0.001
     disCountingFactor = 0.9
     timeToUpdateOnlineModel = 10
     timeToUpdateTargetModel = 100
+
+    # MAB
+    learningRateMAB = 0.1
+    policyParamatersMAB = {
+        "epsilon": 0.5,
+        "min_epsilon": 0.05,
+        "epsilon_decay_rate": 0.95
+    }
 
     # message config
     ttl = 5

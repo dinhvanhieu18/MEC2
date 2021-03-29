@@ -31,25 +31,27 @@ def getNeighborRsuInfo(car):
         input()
         return (0.0, 0.0, None)
 
-def getState(car, message):
+def getState(car, message, network):
     # print("car_{} get state for message id {}".format(car.id, message.stt))
     # print("len waitList of this car {}".format(len(car.waitList)))
     # Info of this message
     res = [message.size, message.cpuCycle]
     # Info of this car
-    res.append(calculateTaskInQueue(car))
+    # res.append(calculateTaskInQueue(car))
     res.append(car.meanDelayProcess)
     res.append(car.meanDelaySendToCar)
     res.append(car.meanDelaySendToRsu)
     res.append(car.meanDelaySendToGnb)
     # Info of it's neighbor car
     neighborCarInfo = getNeighborCarInfo(car)
-    res.append(neighborCarInfo[0])
+    # res.append(neighborCarInfo[0])
     res.append(neighborCarInfo[1])
     # Info of it's neighbor rsu
     neighborRsuInfo = getNeighborRsuInfo(car)
-    res.append(neighborRsuInfo[0])
+    # res.append(neighborRsuInfo[0])
     res.append(neighborRsuInfo[1])
+    # Info of gnb
+    res.append(network.gnb.meanDelay)
     res = np.reshape(res, (1, len(res)))
     # print(res)
     return (res, neighborCarInfo[2], neighborRsuInfo[2])
@@ -68,7 +70,7 @@ def getAction(car, message, currentTime, network):
         nextLocation: [The location where the message will be sent to]
     """    
     # 0: car, 1:rsu, 2:gnb, 3:process
-    stateInfo = getState(car, message)
+    stateInfo = getState(car, message,network)
     currentState = stateInfo[0]
     neighborCar = stateInfo[1]
     neighborRsu = stateInfo[2]
@@ -84,6 +86,10 @@ def getAction(car, message, currentTime, network):
         exclude_actions.append(1)
     # get action by policy
     actionByPolicy = car.optimizer.policy(allActionValues, exclude_actions)
+    experience = [currentState, actionByPolicy, None, None]
+    car.optimizer.addToMemoryTmp(experience, message)
+    car.optimizer.update()
+    # return tuple of action and object the message will be in
     if actionByPolicy == 0:
         res = (0, neighborCar)
     elif actionByPolicy == 1:
@@ -92,9 +98,6 @@ def getAction(car, message, currentTime, network):
         res = (2, network.gnb)
     else:
         res = (3, None)
-    experience = [currentState, res[0], None, None]
-    car.optimizer.addToMemoryTmp(experience, message)
-    car.optimizer.update()
     return res
 
 

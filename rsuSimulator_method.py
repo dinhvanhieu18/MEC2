@@ -19,24 +19,26 @@ def getNeighborRsu(rsu):
         return tmp[random.randint(0, len(tmp)-1)] 
 
 
-def getState(rsu, message):
+def getState(rsu, message, network):
     # Info of this message
     res = [message.size, message.cpuCycle]
     # Info of this rsu
-    res.append(calculateTaskInQueue(rsu))
+    # res.append(calculateTaskInQueue(rsu))
     res.append(rsu.meanDelayProcess)
     res.append(rsu.meanDelaySendToRsu)
     res.append(rsu.meanDelaySendToGnb)
     # Info of it's neighbor rsu
     neighborRsuInfo = getNeighborRsu(rsu)
-    res.append(neighborRsuInfo[0])
+    # res.append(neighborRsuInfo[0])
     res.append(neighborRsuInfo[1])
+    # Info of gnb
+    res.append(network.gnb.meanDelay)
     res = np.reshape(res, (1, len(res)))
     return (res, neighborRsuInfo[2])
 
 def getAction(rsu, message, currentTime, network):
-    # 0: rsu, 1: gnb, 2: process
-    stateInfo = getState(rsu, message)
+    # 1: rsu, 2: gnb, 3: process
+    stateInfo = getState(rsu, message, network)
     currentState = stateInfo[0]
     neighborRsu = stateInfo[1]
     # Update state
@@ -49,15 +51,16 @@ def getAction(rsu, message, currentTime, network):
         exclude_actions.append(0)
     # get action by policy
     actionByPolicy = rsu.optimizer.policy(allActionValues, exclude_actions)
-    if actionByPolicy == 0:
-        res = (0, neighborRsu)
-    elif actionByPolicy == 1:
-        res = (1, network.gnb)
-    else:
-        res = (2, None)
-    experience = [currentState, res[0], None, None]
+    experience = [currentState, actionByPolicy, None, None]
     rsu.optimizer.addToMemoryTmp(experience, message)
     rsu.optimizer.update()
+    # return tuple of action and object the message will be in
+    if actionByPolicy == 0:
+        res = (1, neighborRsu)
+    elif actionByPolicy == 1:
+        res = (2, network.gnb)
+    else:
+        res = (3, None)
     return res
 
 def distanceToCar(rsu, car, currentTime):
