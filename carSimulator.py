@@ -167,7 +167,8 @@ class CarSimulator(Object):
                 message.isDrop = True
             if message.isDrop or startCar.id == self.id:
                 network.output.append(message)
-                update(message, network)
+                if self.optimizer is not None:
+                    update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:

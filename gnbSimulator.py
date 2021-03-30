@@ -52,13 +52,8 @@ class GnbSimulator(Object):
             if startCar.getPosition(currentTime) > Config.roadLength:
                 message.isDrop = True
                 network.output.append(message)
-                # for car_id in message.indexCar:
-                #     car = network.carList[car_id]
-                #     car.optimizer.updateReward(message)
-                # for rsu_id in message.indexRsu:
-                #     rsu = network.rsuList[rsu_id]
-                #     rsu.optimizer.updateReward(message)
-                update(message, network)
+                if startCar.optimizer is not None:
+                    update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:

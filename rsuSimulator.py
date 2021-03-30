@@ -135,7 +135,8 @@ class RsuSimulator(Object):
                 self.distanceToCar(startCar, currentTime) > Config.rsuCoverRadius:
                 message.isDrop = True
                 network.output.append(message)
-                update(message, network)
+                if self.optimizer is not None:
+                    update(message, network)
             else:
                 self.sendToCar(startCar, message, currentTime, network)
         else:
