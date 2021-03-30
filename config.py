@@ -28,7 +28,11 @@ class Config:
 
     # DQN
     hiddenLayerConfig = [16, 8]
-    policyParamaters = {"epsilon": 0.5}
+    policyParamaters = {
+        "epsilon": 0.5,
+        "min_epsilon": 0.05,
+        "epsilon_decay_rate": 0.95
+    }
     queueCapacity = 2000
     batchSize = 16
     learningRate = 0.001
@@ -43,12 +47,16 @@ class Config:
         "min_epsilon": 0.05,
         "epsilon_decay_rate": 0.95
     }
+    # MAB + DQN
+    probChooseF = 1
+    decayRateProbChooseF = 0.95
 
     # message config
     ttl = 5
     maxDelay = 10
 
     # other
+    decayRateMean = 0.8
     carAppearStrategy = "inputFiles/car_deu6.inp"
     carPacketStrategy = "inputFiles/poisson_70.inp"
     simTime = 30

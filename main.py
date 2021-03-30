@@ -5,6 +5,8 @@ from carSimulator import CarSimulator
 from rsuSimulator import RsuSimulator
 from gnbSimulator import GnbSimulator
 from optimizers.DQN import DQN
+from optimizers.MAB import MAB
+from optimizers.MAB_DQN import MAB_DQN
 from config import Config
 
 def main():
@@ -31,7 +33,7 @@ def getRsuList():
             xcord=Config.xList[i],
             ycord=Config.yList[i],
             zcord=Config.zList[i],
-            optimizer=DQN(
+            optimizer=MAB_DQN(
                 agent_name=f"rsu_{i}", 
                 n_states=Config.nStatesRsu, 
                 n_actions=Config.nActionsRsu,
@@ -72,7 +74,7 @@ def carAppear():
         car = CarSimulator(
             id=index, 
             startTime=timeStartCar,
-            optimizer=DQN(
+            optimizer=MAB_DQN(
                 agent_name=f"car_{index}",
                 n_states=Config.nStatesCar,
                 n_actions=Config.nActionsCar,
