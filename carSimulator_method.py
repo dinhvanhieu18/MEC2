@@ -1,12 +1,13 @@
 import random
 import numpy as np
 import math
+import copy
 from config import Config
 from utils import calculateTaskInQueue
 
 def getNeighborCarInfo(car):
     def sortFunc(e):
-        return e[0] * e[1]
+        return e[1]
     tmp = []
     for car_ in car.neighborCars:
         expectedTime = calculateTaskInQueue(car_) / Config.carProcessPerSecond
@@ -70,14 +71,23 @@ def getAction(car, message, currentTime, network):
         nextLocation: [The location where the message will be sent to]
     """    
     # 0: car, 1:rsu, 2:gnb, 3:process
-    stateInfo = getState(car, message,network)
+    currentState = None
+    # Change for fit with your optimize
+    # ************************************************************************
+    # With MAB
+    # neighborCar = getNeighborCarInfo(car)[2]
+    # neighborRsu = getNeighborRsuInfo(car)[2]
+
+    # With MAB_DQN
+    stateInfo = getState(car, message, network)
     currentState = stateInfo[0]
     neighborCar = stateInfo[1]
     neighborRsu = stateInfo[2]
-    # Update state
-    car.optimizer.updateState(message, currentState)
+    car.optimizer.DQN.updateState(message, currentState)
+    # *************************************************************************
+    # Constant
     # get values of all actions
-    allActionValues = car.optimizer.onlineModel.predict(currentState)[0]
+    allActionValues = car.optimizer.getAllActionValues(currentState)
     # exclude actions can't choose
     exclude_actions = []
     if neighborCar is None or len(message.indexCar) >= 2:
@@ -86,9 +96,8 @@ def getAction(car, message, currentTime, network):
         exclude_actions.append(1)
     # get action by policy
     actionByPolicy = car.optimizer.policy(allActionValues, exclude_actions)
-    experience = [currentState, actionByPolicy, None, None]
-    car.optimizer.addToMemoryTmp(experience, message)
-    car.optimizer.update()
+    # Update memory
+    car.optimizer.addToMemoryTmp(message, currentState, actionByPolicy)
     # return tuple of action and object the message will be in
     if actionByPolicy == 0:
         res = (0, neighborCar)

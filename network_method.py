@@ -7,7 +7,7 @@ def dumpOutputPerCycle(network, currentTime):
     network.totalOutsize += len(network.output)
     f = open(f"{os.getcwd()}/{Config.resultsFolder}/{Config.dumpDelayDetail}", "a")
     for mes in network.output:
-        delay = mes.currentTime - mes.sendTime[0]
+        delay = mes.currentTime - mes.startTime
         network.maxDelay = max(delay, network.maxDelay)
         if mes.isDrop:
             network.countDrop += 1
@@ -16,7 +16,7 @@ def dumpOutputPerCycle(network, currentTime):
         mes.setType()
         # f.write(f"{mes.sendTime[0]} \t {mes.currentTime} \t {delay} \t {mes.type} \t {network.maxDelay} \n")
     meanDelay = (network.meanDelay + network.countDrop * network.maxDelay) / network.totalOutsize
-    f.write(f"{currentTime} \t {meanDelay} \t {network.maxDelay} \t {network.totalOutsize} \t {network.countDrop}")
+    f.write(f"{currentTime} \t {meanDelay} \t {network.maxDelay} \t {network.totalOutsize} \t {network.countDrop} \n")
     network.output = []
 
 def dumpOutputFinal(network):
