@@ -58,9 +58,13 @@ class DQN(Optimizer):
 
     def updateReward(self, message, delay, func=updateReward):
         func(self, message, delay)
+        self.update()
 
-    def addToMemoryTmp(self, experience, message, func=addToMemoryTmp):
-        func(self, experience, message)  
+    def addToMemoryTmp(self, message, state, action, func=addToMemoryTmp):
+        func(self, message, state, action)  
+
+    def getAllActionValues(self, state):
+        return self.onlineModel.predict(state)[0]
 
     def replayExperienceFromMemory(self):
         if self.memory.getMemorySize() < Config.batchSize:

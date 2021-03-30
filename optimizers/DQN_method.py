@@ -4,14 +4,17 @@ import random
 import math
 import numpy as np
 from behaviorPolicy.epsilonGreedy import EpsilonGreedy
+from behaviorPolicy.epsilonDecay import EpsilonDecay
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.losses import mean_squared_error
 
 def getBehaviorPolicy(parameters):
-    policy = EpsilonGreedy( 
-        epsilon=parameters["epsilon"]
+    policy = EpsilonDecay( 
+        epsilon=parameters["epsilon"],
+        min_epsilon=parameters["min_epsilon"],
+        epsilon_decay_rate=parameters["epsilon_decay_rate"],
     )
     return policy
 
@@ -38,7 +41,7 @@ def updateState(DQN, message, currentState):
             DQN.cnt += 1
 
     print("Len memory Tmp:", len(DQN.memory.memoryTmp))
-    print(DQN.memory.memoryTmp)
+    # print(DQN.memory.memoryTmp)
 
 def updateReward(DQN, message, delay):
     print("Update Reward {} with message id {}".format(DQN.agent_name, message.stt))
@@ -56,9 +59,10 @@ def updateReward(DQN, message, delay):
             break
     
     print("Len memory Tmp:",len(DQN.memory.memoryTmp))
-    print(DQN.memory.memoryTmp)
+    # print(DQN.memory.memoryTmp)
 
-def addToMemoryTmp(DQN, experience, message):
+def addToMemoryTmp(DQN, message, state, action):
+    experience = [state, action, None, None]
     DQN.memory.addToMemoryTmp([experience, message.stt])
 
     
