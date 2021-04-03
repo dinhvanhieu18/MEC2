@@ -2,10 +2,33 @@ import json
 import argparse
 import math
 import random
+import os
 from dataclasses import dataclass, field
 from typing import Any
 from queue import PriorityQueue
 from config import Config
+import logging
+
+if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
+    os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
+if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}"):
+    os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}")
+
+if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
+    os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
+
+if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}"):
+    os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}")
+else:
+    if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}"):
+        os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}")
+    if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}"):
+        os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}")
+
+logging.basicConfig(filename=f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}", 
+                    format='%(levelname)s:%(message)s', filemode='w')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 def getConfig():

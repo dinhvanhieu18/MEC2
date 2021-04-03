@@ -68,6 +68,7 @@ class Network:
         car.neighborRsu = neighborRsu                
 
     def working(self, currentTime):
+        print("current time {}".format(currentTime))
         # Set neighbor list for this cars
         for car in self.carList:
              # If car isn't in road, continue
@@ -79,7 +80,6 @@ class Network:
         self.collectMessages(currentTime)
         while not self.q.empty():
             mes = self.q.get().item
-            # print(type(mes.currentObject))
             currentLocation = mes.locations[-1]
             if currentLocation == 0:
                 car = self.carList[mes.indexCar[-1]]

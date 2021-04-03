@@ -17,7 +17,7 @@ class MAB_DQN(Optimizer):
         self.probChooseF = 1
         self.decayRateProbChooseF = 0.95
         self.policy = policy_func(parameters=Config.policyParamaters).getPolicy()
-        self.MAB = MAB(agent_name, n_actions, getBehaviorPolicy)
+        self.MAB = MAB(agent_name, n_states, n_actions, getBehaviorPolicy)
         self.DQN = DQN(agent_name, n_states, n_actions, getBehaviorPolicy)
 
     def chooseOptimizer(self):

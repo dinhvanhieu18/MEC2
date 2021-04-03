@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.losses import mean_squared_error
+from utils import logger
 
 def getBehaviorPolicy(parameters):
     policy = EpsilonDecay( 
@@ -30,7 +31,7 @@ def buildModel(DQN, n_states, n_actions):
 
 
 def updateState(DQN, message, currentState):
-    print("Update State {} with message id {}".format(DQN.agent_name, message.stt))
+    logger.info("{} update state with message stt {}".format(DQN.agent_name, message.stt))
     if DQN.memory.memoryTmp:
         preStateInfo = DQN.memory.memoryTmp[-1]
         # Update nextState in experience
@@ -39,26 +40,23 @@ def updateState(DQN, message, currentState):
             DQN.memory.addToMemory(preStateInfo[0])
             del DQN.memory.memoryTmp[-1]
             DQN.cnt += 1
-
-    print("Len memory Tmp:", len(DQN.memory.memoryTmp))
-    # print(DQN.memory.memoryTmp)
+    logger.info("Len memory tmp {}".format(len(DQN.memory.memoryTmp)))
 
 def updateReward(DQN, message, delay):
-    print("Update Reward {} with message id {}".format(DQN.agent_name, message.stt))
+    logger.info("{} update reward with message stt {}".format(DQN.agent_name, message.stt))
     for i, stateInfo in enumerate(DQN.memory.memoryTmp):
         if message.stt == stateInfo[1]:
             # Calculate reward
             reward = 1.0 / (delay + 0.01)
             # Update reward in experience
-            print("Reward:", reward)
+            logger.info("Reward {}".format(reward))
             stateInfo[0][2] = reward
             if stateInfo[0][3] is not None: # Next State not None
                 DQN.memory.addToMemory(stateInfo[0])
                 DQN.cnt += 1
                 del DQN.memory.memoryTmp[i]
             break
-    
-    print("Len memory Tmp:",len(DQN.memory.memoryTmp))
+    logger.info("Len memory tmp {}".format(len(DQN.memory.memoryTmp)))
     # print(DQN.memory.memoryTmp)
 
 def addToMemoryTmp(DQN, message, state, action):

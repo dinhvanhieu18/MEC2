@@ -89,10 +89,6 @@ def carAppear():
 if __name__=="__main__":
     from datetime import datetime
     start = datetime.now()
-    if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
-        os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
-    if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
-        os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
     main()
     end = datetime.now()
     print(start)

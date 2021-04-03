@@ -4,6 +4,7 @@ import math
 import copy
 from config import Config
 from utils import calculateTaskInQueue
+from utils import logger
 
 def getNeighborCarInfo(car):
     def sortFunc(e):
@@ -70,13 +71,24 @@ def getAction(car, message, currentTime, network):
         action: [0:sendToCar, 1:sendToRsu, 2:sendToGnb or 3:process]
         nextLocation: [The location where the message will be sent to]
     """    
+    logger.info("Car {} get action with message stt {}".format(car.id, message.stt))
     # 0: car, 1:rsu, 2:gnb, 3:process
     currentState = None
     # Change for fit with your optimize
     # ************************************************************************
+
+
     # With MAB
-    # neighborCar = getNeighborCarInfo(car)[2]
-    # neighborRsu = getNeighborRsuInfo(car)[2]
+    neighborCar = getNeighborCarInfo(car)[2]
+    neighborRsu = getNeighborRsuInfo(car)[2]
+
+    # fix prop 
+    # pl = 0.5
+    # rand = random.random() 
+    # if rand < pl:
+    #     actionByPolicy = 1
+    # else:
+    #     actionByPolicy = 2
 
     # With MAB_DQN
     stateInfo = getState(car, message, network)
@@ -88,14 +100,17 @@ def getAction(car, message, currentTime, network):
     # Constant
     # get values of all actions
     allActionValues = car.optimizer.getAllActionValues(currentState)
+    logger.info("All action values {}".format(allActionValues))
     # exclude actions can't choose
     exclude_actions = []
     if neighborCar is None or len(message.indexCar) >= 2:
         exclude_actions.append(0)
     if neighborRsu is None:
         exclude_actions.append(1)
+    logger.info("Exclude actions {}".format(exclude_actions))
     # get action by policy
     actionByPolicy = car.optimizer.policy(allActionValues, exclude_actions)
+    logger.info("Choose action {}".format(actionByPolicy))
     # Update memory
     car.optimizer.addToMemoryTmp(message, currentState, actionByPolicy)
     # return tuple of action and object the message will be in
