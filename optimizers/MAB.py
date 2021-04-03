@@ -9,11 +9,11 @@ from optimizers.MAB_method import (
 )
 
 class MAB(Optimizer):
-    def __init__(self, agent_name, n_actions, policy_func=getBehaviorPolicy):
+    def __init__(self, agent_name, n_states, n_actions, policy_func=getBehaviorPolicy):
         self.agent_name = agent_name
         self.nActions = n_actions
         self.policy = policy_func(parameters=Config.policyParamatersMAB).getPolicy()
-        self.values = [0] * self.nActions 
+        self.values = [0] * int(self.nActions) 
         self.memory = {}
 
     def addToMemoryTmp(self, message, state, action, func=addToMemoryTmp):

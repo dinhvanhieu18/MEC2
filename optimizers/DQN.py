@@ -8,6 +8,7 @@ from optimizers.DQN_method import (
     updateReward, buildModel
 )
 from optimizers.utils import SequentialDequeMemory
+from utils import logger
 
 class DQN(Optimizer):
     def __init__(self, agent_name, n_states, n_actions, policy_func=getBehaviorPolicy):
@@ -50,8 +51,8 @@ class DQN(Optimizer):
 
 
     def saveModelWeights(self):
-        # self.onlineModel.save_weights(self.model_file, overwrite=True)
-        pass
+        self.onlineModel.save_weights(self.model_file, overwrite=True)
+        # pass
 
     def updateState(self, message, currentState, func=updateState):
         func(self, message, currentState)
@@ -70,14 +71,14 @@ class DQN(Optimizer):
         if self.memory.getMemorySize() < Config.batchSize:
             return
         experienceBatch = self.memory.getRandomBatchForReplay(batchSize=Config.batchSize)
-        print("{} replay experience with {} experience".format(self.agent_name, len(experienceBatch)))
+        logger.info("{} replay experience with {} experience".format(self.agent_name, len(experienceBatch)))
         self.updateOnlineModel(experienceBatch)
 
     def update(self):
         if self.cnt % Config.timeToUpdateOnlineModel == 0:
             self.replayExperienceFromMemory()
         if self.cnt % Config.timeToUpdateTargetModel == 0:
-            # self.saveModelWeights()
+            self.saveModelWeights()
             self.targetModel.set_weights(self.onlineModel.get_weights())
         
 
