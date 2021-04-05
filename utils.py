@@ -19,33 +19,18 @@ if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
 
 if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}"):
     os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}")
+    input()
 else:
     if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}"):
         os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}")
     if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}"):
         os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}")
-
-logging.basicConfig(filename=f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}", 
-                    format='%(levelname)s:%(message)s', filemode='w')
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
-
-def getConfig():
-    """
-    Get config
-
-    """
-    # Get config path from user
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path", help="Path to config.json")
-    args = parser.parse_args()
-
-    # Load config
-    with open(args.config_path, "r") as f:
-        config = json.load(f)
-
-    return config
+def getLogger():
+    logging.basicConfig(filename=f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}", 
+                        format='%(levelname)s:%(message)s', filemode='w')
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    return logger
 
 def getNext(x):
     return -math.log(1.0 - random.random()) / x

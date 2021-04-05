@@ -1,6 +1,6 @@
 class Config:
     # gnb config
-    gnbProcessPerSecond = 600
+    gnbProcessPerSecond = 1280
     gnbCarMeanTranfer = 0.0009765625
 
     # rsu config
@@ -13,21 +13,22 @@ class Config:
     rsuRsuMeanTranfer = 0.00001
     rsuCarMeanTranfer = 0.0004768371582
     rsuGnbMeanTranfer = 0.00004768371582
-    nActionsRsu = 3
-    nStatesRsu = 7
+    nActionsRsu = 2
+    nStatesRsu = 3
 
     # car config
     carSpeed = 12
     carCoverRadius = 300
     carProcessPerSecond = 50
+    packageStrategy = "poisson_70"
     carCarMeanTranfer = 0.00001
     carRsuMeanTranfer = 0.0009765625
     carGnbMeanTranfer = 0.0004768371582
-    nActionsCar = 4
-    nStatesCar = 9
+    nActionsCar = 2
+    nStatesCar = 2
 
     # DQN
-    hiddenLayerConfig = [16]
+    hiddenLayerConfig = [4]
     policyParamaters = {
         "epsilon": 0.5,
         "min_epsilon": 0.1,
@@ -57,17 +58,20 @@ class Config:
 
     # other
     decayRateMean = 0.8
-    carAppearStrategy = "inputFiles/car_deu20.inp"
-    carPacketStrategy = "inputFiles/poisson_50.inp"
-    simTime = 1000
+    carAppearStrategy = "inputFiles/car_deu5.inp"
+    carPacketStrategy = "inputFiles/poisson_70.inp"
+    simTime = 5000
     cycleTime = 1.0
     roadLength = 1500
     loggingFile = "log.log"
     dumpDelayDetail = "delayDetail.txt"
     messageDetail = "messageDetail.txt"
     dumpDelayGeneral = "delayGeneral.txt"
-    expName = "MAB_DQN"
+    expName = "0.5_0.5"
     weightsFolder = "weights"
     resultsFolder = "results"
+    default_pl = 0.5
+    default_pr = 0.5
+    optimizer = "fix_prob"
 
     

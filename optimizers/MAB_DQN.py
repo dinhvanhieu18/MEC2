@@ -35,6 +35,9 @@ class MAB_DQN(Optimizer):
     def updateReward(self, message, delay, func=updateReward):
         func(self, message, delay)
 
+    def updateState(self, message, state):
+        self.DQN.updateState(message, state)
+
     def getAllActionValues(self, state):
         optimizer = self.chooseOptimizer()
         return optimizer.getAllActionValues(state)

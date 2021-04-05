@@ -6,17 +6,20 @@ from message import Message
 from config import Config
 from carSimulator_method import (
     getPosition, distanceToCar, 
-    distanceToRsu, getAction
+    distanceToRsu, getAction, 
+    generateMessage
 )
-from utils import update
+from utils import update, getNext
 
 class CarSimulator(Object):
 
-    def __init__(self, id, startTime, optimizer=None):
+    def __init__(self, id, startTime, packageStrategy=Config.packageStrategy, \
+        processPerSecond=Config.carProcessPerSecond, optimizer=None):
         Object.__init__(self)
         self.id = id
         self.startTime = startTime
-        self.numMessage = 0
+        self.packageStrategy = packageStrategy
+        self.processPerSecond = processPerSecond
         self.optimizer = optimizer
         self.neighborCars = []
         self.neighborRsu = None
@@ -35,20 +38,23 @@ class CarSimulator(Object):
         """        
         # Collect from waitList
         res = Object.collectMessages(self, currentTime)
-        # Generate message
-        if self.numMessage >= len(listTimeMessages):
-            return res
-        curTime = listTimeMessages[self.numMessage]
-        while True:
-            sendTime = self.startTime + curTime
-            if sendTime > currentTime + Config.cycleTime:
-                return res
-            mes = Message(indexCar=self.id, time=sendTime)
+        genMessages = generateMessage(self, currentTime)
+        for mes in genMessages:
             res.append(mes)
-            self.numMessage += 1
-            if (self.numMessage >= len(listTimeMessages)):
-                return res
-            curTime = listTimeMessages[self.numMessage]
+        # Generate message
+        # if self.numMessage >= len(listTimeMessages):
+        #     return res
+        # curTime = listTimeMessages[self.numMessage]
+        # while True:
+        #     sendTime = self.startTime + curTime
+        #     if sendTime > currentTime + Config.cycleTime:
+        #         return res
+        #     mes = Message(indexCar=self.id, time=sendTime)
+        #     res.append(mes)
+        #     self.numMessage += 1
+        #     if (self.numMessage >= len(listTimeMessages)):
+        #         return res
+        #     curTime = listTimeMessages[self.numMessage]
         return res
 
     def sendToCar(self, car, message, currentTime, network):
@@ -173,7 +179,7 @@ class CarSimulator(Object):
                 self.sendToCar(startCar, message, currentTime, network)
         else:
             action, nextLocation = getAction(self, message, currentTime, network)
-            # 0: sendToCar, 1:sendToRsu, 2: sendToGnb, 3:process
+            # 0: sendToCar, 1: sendToRsu, 2: sendToGnb, 3: process
             if action == 0: 
                 self.sendToCar(nextLocation, message, currentTime, network)
             elif action == 1:

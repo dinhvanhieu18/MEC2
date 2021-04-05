@@ -10,5 +10,8 @@ class Optimizer:
     def updateReward(self, message, delay):
         pass
 
+    def updateState(self, message, state):
+        pass
+
     def getAllActionValues(self, state):
         pass

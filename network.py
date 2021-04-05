@@ -4,7 +4,7 @@ from config import Config
 from network_method import dumpOutputPerCycle, dumpOutputFinal
 
 class Network:
-    def __init__(self, gnb, rsuList, carList, listTimeMessages):
+    def __init__(self, gnb, rsuList, carList, listTimeMessages=[]):
         self.gnb = gnb
         self.rsuList = rsuList
         self.carList = carList

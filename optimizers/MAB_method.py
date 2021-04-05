@@ -1,6 +1,7 @@
 from config import Config
 from behaviorPolicy.epsilonDecay import EpsilonDecay
-from utils import logger
+from utils import getLogger
+logger = getLogger
 
 def getBehaviorPolicy(parameters):
     policy = EpsilonDecay( 

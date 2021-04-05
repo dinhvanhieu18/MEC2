@@ -141,7 +141,7 @@ class RsuSimulator(Object):
                 self.sendToCar(startCar, message, currentTime, network)
         else:
             action, nextLocation = getAction(self, message, currentTime, network)
-            # 0: sendToRsu, 1:sendToGnb, 2:process
+            # 0: sendToCar, 1: sendToRsu, 2: sendToGnb, 3: process
             if action == 1: 
                 self.sendToRsu(nextLocation, message, currentTime, network)
             elif action == 2:

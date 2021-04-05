@@ -8,7 +8,8 @@ from optimizers.DQN_method import (
     updateReward, buildModel
 )
 from optimizers.utils import SequentialDequeMemory
-from utils import logger
+from utils import getLogger
+logger = getLogger()
 
 class DQN(Optimizer):
     def __init__(self, agent_name, n_states, n_actions, policy_func=getBehaviorPolicy):
