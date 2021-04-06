@@ -1,11 +1,9 @@
 import random
 import numpy as np
 import math
-import copy
+import os
 from config import Config
-from utils import calculateTaskInQueue
-from utils import getLogger
-logger = getLogger()
+from utils import logger
 
 # def getNeighborRsuInfo(rsu):
 #     def sortFunc(e):
@@ -50,7 +48,7 @@ def getAction(rsu, message, currentTime, network):
         allActionValues = rsu.optimizer.getAllActionValues(currentState)
         logger.info("All action values {}".format(allActionValues))
         # get action by policy
-        actionByPolicy = car.optimizer.policy(allActionValues)
+        actionByPolicy = rsu.optimizer.policy(allActionValues)
         logger.info("Choose action {}".format(actionByPolicy))
         # Update memory
         rsu.optimizer.addToMemoryTmp(message, currentState, actionByPolicy)

@@ -29,12 +29,18 @@ def main():
 
 def getRsuList():
     res = []
+    xList = Config.xList.split(";")
+    xList = [int(i) for i in xList]
+    yList = Config.yList.split(";")
+    yList = [int(i) for i in yList]
+    zList = Config.zList.split(";")
+    zList = [int(i) for i in zList]
     for i in range(Config.rsuNumbers):
         rsu = RsuSimulator(
             id=i,
-            xcord=Config.xList[i],
-            ycord=Config.yList[i],
-            zcord=Config.zList[i],
+            xcord=xList[i],
+            ycord=yList[i],
+            zcord=zList[i],
             optimizer=getOptimizer(
                 agent_name=f"rsu_{i}",
                 n_states=Config.nStatesRsu,
@@ -62,7 +68,7 @@ def prepareTimeMessages():
 
 def carAppear():
     try:
-        f = open(Config.carAppearStrategy, "r")
+        f = open(f"{Config.fileFolder}/{Config.carAppearStrategy}", "r")
     except:
         print("File car not found")
         exit()
@@ -111,40 +117,8 @@ def getOptimizer(agent_name, n_states, n_actions):
         optimizer = None
     return optimizer
 
-def getArgs():
-    """
-    Get config
-
-    """
-    # Get config path from user
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--pl")
-    parser.add_argument("--pr")
-    args = parser.parse_args()
-    return args
-
 if __name__=="__main__":
     start = datetime.now()
-    args = getArgs()
-    Config.default_pl = float(args.pl)
-    Config.default_pr = float(args.pr)
-    Config.expName = f"{args.pl}_{args.pr}"
-
-    if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
-        os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
-    if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}"):
-        os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}")
-
-    if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
-        os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
-
-    if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}"):
-        os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}")
-    else:
-        if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}"):
-            os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}")
-        if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}"):
-            os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}")
     main()
     end = datetime.now()
     print(start)

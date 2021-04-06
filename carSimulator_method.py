@@ -1,12 +1,10 @@
 import random
 import numpy as np
 import math
-import copy
+import os
 from config import Config
-from utils import calculateTaskInQueue
-from utils import getLogger, getNext
+from utils import logger, getNext
 from message import Message
-logger = getLogger()
 
 def generateMessage(car, currentTime):
     numMessagePerSecond = int(car.packageStrategy.split("_")[-1])

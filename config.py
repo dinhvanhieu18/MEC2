@@ -4,10 +4,10 @@ class Config:
     gnbCarMeanTranfer = 0.0009765625
 
     # rsu config
-    rsuNumbers = 6
-    xList = [125, 375, 625, 875, 1125, 1375]
-    yList = [1, 1, 1, 1, 1, 1]
-    zList = [10, 10, 10, 10, 10, 10]
+    rsuNumbers = 5
+    xList = '150;450;750;1050;1350'
+    yList = '1;1;1;1;1'
+    zList = '10;10;10;10;10'
     rsuCoverRadius = 151
     rsuProcessPerSecond = 320
     rsuRsuMeanTranfer = 0.00001
@@ -20,7 +20,7 @@ class Config:
     carSpeed = 12
     carCoverRadius = 300
     carProcessPerSecond = 50
-    packageStrategy = "poisson_70"
+    packageStrategy = 'poisson_70'
     carCarMeanTranfer = 0.00001
     carRsuMeanTranfer = 0.0009765625
     carGnbMeanTranfer = 0.0004768371582
@@ -58,20 +58,21 @@ class Config:
 
     # other
     decayRateMean = 0.8
-    carAppearStrategy = "inputFiles/car_deu5.inp"
-    carPacketStrategy = "inputFiles/poisson_70.inp"
-    simTime = 5000
+    fileFolder = "inputFiles"
+    carAppearStrategy = 'car_deu5.inp'
+    carPacketStrategy = "poisson_70.inp"
+    simTime = 30
     cycleTime = 1.0
     roadLength = 1500
     loggingFile = "log.log"
     dumpDelayDetail = "delayDetail.txt"
     messageDetail = "messageDetail.txt"
     dumpDelayGeneral = "delayGeneral.txt"
-    expName = "0.5_0.5"
     weightsFolder = "weights"
-    resultsFolder = "results"
-    default_pl = 0.5
-    default_pr = 0.5
-    optimizer = "fix_prob"
+    resultsFolder = "results/script1"
+    default_pl = 1.0
+    default_pr = 0.0
+    expName = f"{default_pl}_{default_pr}"
+    optimizer = "prob"
 
     

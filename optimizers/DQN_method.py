@@ -9,8 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.losses import mean_squared_error
-from utils import getLogger
-logger = getLogger()
+from utils import logger
 
 def getBehaviorPolicy(parameters):
     policy = EpsilonDecay( 

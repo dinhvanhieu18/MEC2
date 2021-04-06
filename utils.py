@@ -8,29 +8,28 @@ from typing import Any
 from queue import PriorityQueue
 from config import Config
 import logging
+try:
+    # os.makedirs(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}")
+    os.makedirs(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}")
+except:
+    pass
+try:
+    os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.dumpDelayDetail}")
+    os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}")
+except:
+    pass
 
-if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}"):
-    os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}")
-if not os.path.exists(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}"):
-    os.mkdir(f"{os.getcwd()}/{Config.weightsFolder}/{Config.expName}")
-
-if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}"):
-    os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}")
-
-if not os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}"):
-    os.mkdir(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}")
-    input()
-else:
-    if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}"):
-        os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.messageDetail}")
-    if os.path.exists(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}"):
-        os.remove(f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}")
-def getLogger():
-    logging.basicConfig(filename=f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}", 
-                        format='%(levelname)s:%(message)s', filemode='w')
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    return logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(
+            f"{os.getcwd()}/{Config.resultsFolder}/{Config.expName}/{Config.loggingFile}", 
+            mode="w"
+        )
+    ]
+)
+logger = logging.getLogger()
 
 def getNext(x):
     return -math.log(1.0 - random.random()) / x
