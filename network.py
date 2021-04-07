@@ -15,6 +15,9 @@ class Network:
         self.countDrop = 0
         self.totalOutsize = 0
         self.maxDelay = 0
+        self.cntType1 = 0
+        self.cntType2 = 0
+        self.cntType3 = 0
         self.setNeighborRsu()
 
     def setNeighborRsu(self):
@@ -68,7 +71,7 @@ class Network:
         car.neighborRsu = neighborRsu                
 
     def working(self, currentTime):
-        print("current time {}".format(currentTime))
+        print("{} {} current time {}".format(Config.expName, Config.packageStrategy ,currentTime))
         # Set neighbor list for this cars
         for car in self.carList:
              # If car isn't in road, continue
