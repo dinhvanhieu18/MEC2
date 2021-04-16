@@ -32,6 +32,7 @@ def buildModel(DQN, n_states, n_actions):
 
 def updateState(DQN, message, currentState):
     logger.info("{} update state with message stt {}".format(DQN.agent_name, message.stt))
+    logger.info("Pre update state {}".format(DQN.memory.memoryTmp))
     if DQN.memory.memoryTmp:
         preStateInfo = DQN.memory.memoryTmp[-1]
         # Update nextState in experience
@@ -40,24 +41,28 @@ def updateState(DQN, message, currentState):
             DQN.memory.addToMemory(preStateInfo[0])
             del DQN.memory.memoryTmp[-1]
             DQN.cnt += 1
-    logger.info("Len memory tmp {}".format(len(DQN.memory.memoryTmp)))
+    logger.info("After update state {}".format(DQN.memory.memoryTmp))
 
 def updateReward(DQN, message, delay):
     logger.info("{} update reward with message stt {}".format(DQN.agent_name, message.stt))
+    logger.info("Pre update reward {}".format(DQN.memory.memoryTmp))
+    state = None
     for i, stateInfo in enumerate(DQN.memory.memoryTmp):
         if message.stt == stateInfo[1]:
             # Calculate reward
-            reward = 1.0 / (delay + 0.01)
+            # reward = 1.0 / (delay + 0.01)
+            reward = -delay
             # Update reward in experience
             logger.info("Reward {}".format(reward))
             stateInfo[0][2] = reward
+            state = stateInfo[0][0]
             if stateInfo[0][3] is not None: # Next State not None
                 DQN.memory.addToMemory(stateInfo[0])
                 DQN.cnt += 1
                 del DQN.memory.memoryTmp[i]
             break
-    logger.info("Len memory tmp {}".format(len(DQN.memory.memoryTmp)))
-    # print(DQN.memory.memoryTmp)
+    logger.info("After update reward {}".format(DQN.memory.memoryTmp))
+    return state
 
 def addToMemoryTmp(DQN, message, state, action):
     experience = [state, action, None, None]

@@ -14,7 +14,7 @@ class Config:
     rsuCarMeanTranfer = 0.0004768371582
     rsuGnbMeanTranfer = 0.00004768371582
     nActionsRsu = 2
-    nStatesRsu = 3
+    nStatesRsu = 4
 
     # car config
     carSpeed = 12
@@ -25,15 +25,15 @@ class Config:
     carRsuMeanTranfer = 0.0009765625
     carGnbMeanTranfer = 0.0004768371582
     nActionsCar = 2
-    nStatesCar = 2
+    nStatesCar = 4
 
     # DQN
-    hiddenLayerConfig = [4]
-    policyParamaters = {
-        "epsilon": 0.5,
-        "min_epsilon": 0.1,
-        "epsilon_decay_rate": 0.995
-    }
+    hiddenLayerConfig = [8]
+    # policyParamaters = {
+    #     "epsilon": 0.5,
+    #     "min_epsilon": 0.1,
+    #     "epsilon_decay_rate": 0.995
+    # }
     queueCapacity = 2000
     batchSize = 16
     learningRate = 0.001
@@ -43,14 +43,19 @@ class Config:
 
     # MAB
     learningRateMAB = 0.1
-    policyParamatersMAB = {
+    # policyParamatersMAB = {
+    #     "epsilon": 0.5,
+    #     "min_epsilon": 0.1,
+    #     "epsilon_decay_rate": 0.995
+    # }
+    policyParamaters = {
         "epsilon": 0.5,
-        "min_epsilon": 0.1,
-        "epsilon_decay_rate": 0.995
+        "w": 250,
     }
     # MAB + DQN
-    probChooseF = 1
-    decayRateProbChooseF = 0.995
+    minprobChooseF = 0.05
+    decayRateProbChooseF = 0.95
+    threadHoldStable = 0.95
 
     # message config
     ttl = 5
@@ -58,21 +63,22 @@ class Config:
 
     # other
     decayRateMean = 0.8
+    maxLenMemory = 100
     fileFolder = "inputFiles"
     carAppearStrategy = 'car_deu5.inp'
-    carPacketStrategy = "poisson_70.inp"
-    simTime = 30
-    cycleTime = 1.0
+    # carPacketStrategy = "poisson_70.inp"
+    simTime = 1000
+    cycleTime = 0.05
     roadLength = 1500
     loggingFile = "log.log"
     dumpDelayDetail = "delayDetail.txt"
     messageDetail = "messageDetail.txt"
     dumpDelayGeneral = "delayGeneral.txt"
     weightsFolder = "weights"
-    resultsFolder = "results/script1"
-    default_pl = 1.0
+    resultsFolder = 'results/script1'
+    default_pl = 0.5
     default_pr = 0.0
-    expName = f"{default_pl}_{default_pr}"
-    optimizer = "prob"
+    expName = f"MAB_DQN"
+    optimizer = "MAB_DQN"
 
     

@@ -3,8 +3,9 @@ import numpy as np
 import math
 import os
 from config import Config
-from utils import logger, getNext
+from utils import getNext
 from message import Message
+from utils import logger
 
 def generateMessage(car, currentTime):
     numMessagePerSecond = int(car.packageStrategy.split("_")[-1])
@@ -67,10 +68,11 @@ def getState(car, message, network):
     # res.append(neighborRsuInfo[0])
     # res.append(neighborRsuInfo[1])
     # Info of gnb
-    res.append(car.neighborRsu.meanDelay)
-    res.append(network.gnb.meanDelay)
+    res.append(car.meanDelaySendToRsu)
+    res.append(car.meanDelaySendToGnb)
+    res.append(car.neighborRsu.numTask)
+    res.append(network.gnb.numTask)
     res = np.reshape(res, (1, len(res)))
-    # print(res)
     return res
 
 def getAction(car, message, currentTime, network):

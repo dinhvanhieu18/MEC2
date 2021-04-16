@@ -23,6 +23,7 @@ class DQN(Optimizer):
         self.memory = SequentialDequeMemory(Config.queueCapacity)
         self.cnt = 0
         self.model_file = f"{os.getcwd()}/{Config.weightsFolder}/{agent_name}.h5"
+        self.stable =False
         # self.loadModelWeights()
 
     def updateOnlineModel(self, experiences):
@@ -43,7 +44,6 @@ class DQN(Optimizer):
         Y_train = np.vstack(Y_train)
         self.onlineModel.fit(X_train, Y_train, epochs=1, batch_size=Config.batchSize)
 
-
     def loadModelWeights(self):
         if os.path.exists(self.model_file):
             self.onlineModel.load_weights(self.model_file)
@@ -58,8 +58,10 @@ class DQN(Optimizer):
         func(self, message, currentState)
 
     def updateReward(self, message, delay, func=updateReward):
-        func(self, message, delay)
-        self.update()
+        state = func(self, message, delay)
+        if self.stable:
+            self.update()
+        return state
 
     def addToMemoryTmp(self, message, state, action, func=addToMemoryTmp):
         func(self, message, state, action)  
@@ -71,7 +73,7 @@ class DQN(Optimizer):
         if self.memory.getMemorySize() < Config.batchSize:
             return
         experienceBatch = self.memory.getRandomBatchForReplay(batchSize=Config.batchSize)
-        logger.info("{} replay experience with {} experience".format(self.agent_name, len(experienceBatch)))
+        print("{} replay experience with {} experience".format(self.agent_name, len(experienceBatch)))
         self.updateOnlineModel(experienceBatch)
 
     def update(self):

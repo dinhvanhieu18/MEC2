@@ -27,14 +27,16 @@ def getState(rsu, message, network):
     # res.append(calculateTaskInQueue(rsu))
     res = []
     res.append(rsu.meanDelayProcess)
-    # res.append(rsu.meanDelaySendToRsu)
     res.append(rsu.meanDelaySendToGnb)
+    # res.append(rsu.meanDelaySendToRsu)
+    res.append(rsu.numTask)
+    res.append(network.gnb.numTask)
     # Info of it's neighbor rsu
     # neighborRsuInfo = getNeighborRsuInfo(rsu)
     # res.append(neighborRsuInfo[0])
     # res.append(neighborRsuInfo[1])
     # Info of gnb
-    res.append(network.gnb.meanDelay)
+    # res.append(network.gnb.meanDelay)
     res = np.reshape(res, (1, len(res)))
     return res
 

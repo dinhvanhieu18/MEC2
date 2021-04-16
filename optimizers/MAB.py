@@ -12,8 +12,9 @@ class MAB(Optimizer):
     def __init__(self, agent_name, n_states, n_actions, policy_func=getBehaviorPolicy):
         self.agent_name = agent_name
         self.nActions = n_actions
-        self.policy = policy_func(parameters=Config.policyParamatersMAB).getPolicy()
-        self.values = [0] * int(self.nActions) 
+        self.policy = policy_func(parameters=Config.policyParamaters).getPolicy()
+        self.values = [0] * self.nActions
+        self.cntTakeAction = [0] * self.nActions
         self.memory = {}
 
     def addToMemoryTmp(self, message, state, action, func=addToMemoryTmp):
@@ -24,6 +25,15 @@ class MAB(Optimizer):
 
     def getAllActionValues(self, state=None):
         return list(self.values)
+
+    # def update(self, values, cnts):
+    #     for i in range(len(values)):
+    #         if cnts[i] == 0:
+    #             continue
+    #         self.cntTakeAction[i] += cnts[i]
+    #         reward = - values[i] / cnts[i]
+    #         learningRate = 1 / self.cntTakeAction[i]
+    #         self.values[i] = (1 - learningRate) * self.values[i] + learningRate * reward
         
         
 

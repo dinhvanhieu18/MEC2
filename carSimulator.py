@@ -10,6 +10,7 @@ from carSimulator_method import (
     generateMessage
 )
 from utils import update, getNext
+from collections import deque
 
 class CarSimulator(Object):
 
@@ -23,6 +24,7 @@ class CarSimulator(Object):
         self.optimizer = optimizer
         self.neighborCars = []
         self.neighborRsu = None
+        # self.memory = deque(maxlen=Config.maxLenMemory)
 
     def collectMessages(self, currentTime, listTimeMessages):
         """Collect the messages in waitList which have the current time
@@ -41,6 +43,7 @@ class CarSimulator(Object):
         genMessages = generateMessage(self, currentTime)
         for mes in genMessages:
             res.append(mes)
+            self.numTask += 1
         # Generate message
         # if self.numMessage >= len(listTimeMessages):
         #     return res
@@ -188,6 +191,9 @@ class CarSimulator(Object):
                 self.sendToGnb(nextLocation, message, currentTime, network)
             else:
                 self.process(message, currentTime, network)
+            self.numTask -= 1
+            if nextLocation is not None:
+                nextLocation.numTask += 1
 
         
 

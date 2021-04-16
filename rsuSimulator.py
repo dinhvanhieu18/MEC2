@@ -6,6 +6,7 @@ from rsuSimulator_method import (
     getAction, distanceToCar, distanceToRsu
 )
 from utils import update
+from collections import deque
 
 class RsuSimulator(Object):
 
@@ -17,6 +18,7 @@ class RsuSimulator(Object):
         self.zcord = zcord
         self.optimizer = optimizer
         self.neighbors = []
+        # self.memory = deque(maxlen=Config.maxLenMemory)
 
 
     def sendToCar(self, car, message, currentTime, network):
@@ -148,6 +150,9 @@ class RsuSimulator(Object):
                 self.sendToGnb(nextLocation, message, currentTime, network)
             else:
                 self.process(message, currentTime, network)
+            self.numTask -= 1
+            if nextLocation is not None:
+                nextLocation.numTask += 1
 
         
 

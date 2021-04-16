@@ -7,6 +7,7 @@ from optimizers.MAB_DQN_method import (
     getBehaviorPolicy,
     updateReward,
     addToMemoryTmp,
+    chooseOptimizer,
 )
 
 class MAB_DQN(Optimizer):
@@ -15,25 +16,20 @@ class MAB_DQN(Optimizer):
         self.nStates = n_states
         self.nActions = n_actions
         self.probChooseF = 1
-        self.decayRateProbChooseF = 0.95
         self.policy = policy_func(parameters=Config.policyParamaters).getPolicy()
         self.MAB = MAB(agent_name, n_states, n_actions, getBehaviorPolicy)
         self.DQN = DQN(agent_name, n_states, n_actions, getBehaviorPolicy)
+        self.stable = False
 
-    def chooseOptimizer(self):
-        prob = random.random()
-        if prob < self.probChooseF:
-            optimize = self.MAB
-        else:
-            optimize = self.DQN
-        self.probChooseF *= self.decayRateProbChooseF
-        return optimize
+    def chooseOptimizer(self,func=chooseOptimizer):
+        return func(self)
 
     def addToMemoryTmp(self, message, state, action, func=addToMemoryTmp):
         func(self, message, state, action)
 
     def updateReward(self, message, delay, func=updateReward):
         func(self, message, delay)
+        
 
     def updateState(self, message, state):
         self.DQN.updateState(message, state)

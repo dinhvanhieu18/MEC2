@@ -21,6 +21,7 @@ class Object:
         self.cntSendToRsu = 0
         self.cntSendToGnb = 0
         self.cntDrop = 0
+        self.numTask = 0
 
     def collectMessages(self, currentTime):
         """Collect the messages in waitList which have the current time

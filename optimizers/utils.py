@@ -3,7 +3,7 @@ import random
 
 class SequentialDequeMemory:
     def __init__(self, queueCapacity=2000):
-        self.queueCapacity = 2000
+        self.queueCapacity = queueCapacity
         self.memory = deque(maxlen=self.queueCapacity)
         self.memoryTmp = []
 

@@ -58,4 +58,5 @@ class GnbSimulator(Object):
                 self.sendToCar(startCar, message, currentTime, network)
         else:
             self.process(message, currentTime, network)
+            self.numTask -= 1
 
